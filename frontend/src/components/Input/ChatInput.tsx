@@ -179,14 +179,14 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   const enabledAdapters = availableAdapters.filter((a) => a.enabled)
 
   return (
-    <div className="flex flex-col border-t border-dionysus-subtle-border bg-dionysus-panel-bg px-4 py-3 backdrop-blur-xl">
+    <div className="flex flex-col border-t border-dionysus-subtle-border bg-dionysus-glass-bg px-4 py-3 backdrop-blur-xl">
       <QuickActionBar
         activeMode={activeMode}
         onSetMode={setActiveMode}
         onCdClick={handleCdClick}
         onSessionsClick={handleSessionsClick}
       />
-      <div className="flex items-end gap-2">
+      <div className="flex items-end gap-2 rounded-2xl border border-dionysus-subtle-border bg-dionysus-glass-bg px-3 py-2 backdrop-blur-md">
         <div className="relative" ref={adapterMenuRef}>
           <button
             type="button"
@@ -236,6 +236,8 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
           <Paperclip className="h-5 w-5" />
         </button>
 
+        <span className="select-none pb-2.5 text-sm text-dionysus-text-secondary">&gt;</span>
+
         <textarea
           ref={textareaRef}
           value={text}
@@ -248,8 +250,8 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
             isComposingRef.current = false
           }}
           rows={computeRows(text)}
-          placeholder="输入消息… 支持 / 快捷指令"
-          className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-dionysus-subtle-border bg-dionysus-glass-highlight px-4 py-2.5 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70 focus:border-dionysus-primary focus:ring-2 focus:ring-dionysus-primary/30"
+          placeholder="给 Agent 发送消息…"
+          className="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
         />
 
         <button
