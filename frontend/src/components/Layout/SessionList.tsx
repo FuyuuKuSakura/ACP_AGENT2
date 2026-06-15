@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { Plus, Trash2, MessageSquare, Pencil } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLayoutStore } from '@/stores/layoutStore'
+import MobileSessionListHeader from './MobileSessionListHeader'
 import type { Session } from '@/types/protocol'
 
 interface SessionListProps {
