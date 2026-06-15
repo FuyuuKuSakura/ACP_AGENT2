@@ -14,7 +14,7 @@ from dionysus_server.config import get_config_dir
 
 logger = structlog.get_logger()
 
-_BUILTIN_THEME_IDS = {"dark_glass", "exusiai_default", "paseo_dark"}
+_BUILTIN_THEME_IDS = {"default_dark", "default_light"}
 _THEME_SCHEMA_KEYS = {"id", "name", "mode", "fonts", "colors", "assets"}
 
 

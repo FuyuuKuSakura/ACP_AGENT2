@@ -34,56 +34,28 @@ const COLOR_KEYS: { key: keyof Theme['colors']; label: string }[] = [
 
 const PRESETS: { label: string; theme: Partial<Theme> }[] = [
   {
-    label: 'Paseo',
+    label: '默认暗色',
     theme: {
-      id: 'paseo_dark',
-      name: 'Paseo 暗色',
+      id: 'default_dark',
+      name: '默认暗色',
       mode: 'dark',
       colors: DEFAULT_THEME.colors,
     },
   },
   {
-    label: 'Exusiai',
+    label: '默认浅色',
     theme: {
-      id: 'exusiai_default',
-      name: '能天使',
-      mode: 'dark',
-      colors: {
-        primary: '#ff7043',
-        primaryHover: '#ff8a65',
-        accent: '#ffd54f',
-        background: '#0b0c15',
-        chatBackground: '#121420',
-        userBubble: '#ff7043',
-        agentBubbleLight: '#f5f5f7',
-        agentBubbleDark: '#1a1d2e',
-        textPrimaryLight: '#1d1d1f',
-        textPrimaryDark: '#f5f5f7',
-        textSecondary: '#9aa3b2',
-        system: '#6b7280',
-        danger: '#ff5252',
-        success: '#69f0ae',
-        codeBackgroundLight: '#f4f4f5',
-        codeBackgroundDark: '#0f111a',
-        borderLight: '#e5e5e7',
-        borderDark: 'rgba(255, 112, 67, 0.35)',
-      },
-    },
-  },
-  {
-    label: 'Light',
-    theme: {
-      id: 'light',
-      name: '浅色',
+      id: 'default_light',
+      name: '默认浅色',
       mode: 'light',
       colors: {
-        primary: '#6366f1',
-        primaryHover: '#4f46e5',
-        accent: '#8b5cf6',
-        background: '#f5f5f7',
+        primary: '#2563eb',
+        primaryHover: '#3b82f6',
+        accent: '#38bdf8',
+        background: '#f5f7fa',
         chatBackground: '#ffffff',
-        userBubble: '#6366f1',
-        agentBubbleLight: '#f5f5f7',
+        userBubble: '#2563eb',
+        agentBubbleLight: '#ffffff',
         agentBubbleDark: '#1f2937',
         textPrimaryLight: '#1d1d1f',
         textPrimaryDark: '#f5f5f7',
@@ -92,9 +64,9 @@ const PRESETS: { label: string; theme: Partial<Theme> }[] = [
         danger: '#ef4444',
         success: '#22c55e',
         codeBackgroundLight: '#f4f4f5',
-        codeBackgroundDark: '#0c0c0e',
-        borderLight: '#e5e5e7',
-        borderDark: 'rgba(255,255,255,0.1)',
+        codeBackgroundDark: '#1f2937',
+        borderLight: 'rgba(0, 0, 0, 0.06)',
+        borderDark: 'rgba(255, 255, 255, 0.1)',
       },
     },
   },
@@ -201,11 +173,7 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
   const deleteTheme = async () => {
     if (!themeId) return
     const builtin = allThemes.find((t) => t.id === themeId)?.id
-    if (
-      builtin === 'paseo_dark' ||
-      builtin === 'dark_glass' ||
-      builtin === 'exusiai_default'
-    ) {
+    if (builtin === 'default_dark' || builtin === 'default_light') {
       setMessage('不能删除内置主题')
       return
     }
