@@ -34,8 +34,16 @@ interface AdapterCapability {
 }
 
 export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, initialTab, sendMessage }: SettingsPanelProps) {
-  const { live2dEnabled, stylePreset, fontSize, setLive2dEnabled, setStylePreset, setFontSize } =
-    useSettingsStore()
+  const {
+    live2dEnabled,
+    stylePreset,
+    fontSize,
+    compactMode,
+    setLive2dEnabled,
+    setStylePreset,
+    setFontSize,
+    setCompactMode,
+  } = useSettingsStore()
   const { setTrackingEnabled } = useLive2DStore()
 
   const [activeTab, setActiveTab] = useState<Tab>('appearance')
