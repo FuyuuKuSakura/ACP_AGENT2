@@ -13,9 +13,10 @@ interface HeaderProps {
   onSettingsClick: () => void
   showBack?: boolean
   connected?: boolean
+  settingsActive?: boolean
 }
 
-export default function Header({ onSettingsClick, showBack = false, connected = false }: HeaderProps) {
+export default function Header({ onSettingsClick, showBack = false, connected = false, settingsActive = false }: HeaderProps) {
   const currentSession = useChatStore((state) =>
     state.sessions.find((s) => s.id === state.currentSessionId),
   )
