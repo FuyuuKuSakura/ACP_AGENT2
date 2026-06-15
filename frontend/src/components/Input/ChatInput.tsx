@@ -186,12 +186,12 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
         onCdClick={handleCdClick}
         onSessionsClick={handleSessionsClick}
       />
-      <div className="flex items-end gap-2 rounded-2xl border border-dionysus-subtle-border bg-dionysus-glass-bg px-3 py-2 backdrop-blur-md">
+      <div className="flex items-end gap-1.5 rounded-2xl border border-dionysus-subtle-border bg-dionysus-glass-bg px-2 py-1.5 backdrop-blur-md sm:gap-2 sm:px-3 sm:py-2">
         <div className="relative" ref={adapterMenuRef}>
           <button
             type="button"
             onClick={() => setShowAdapterMenu((v) => !v)}
-            className="flex items-center gap-1.5 rounded-full border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-text-secondary transition-all hover:border-dionysus-primary/50"
+            className="flex items-center gap-1 rounded-full border border-dionysus-subtle-border bg-dionysus-glass-highlight px-2 py-1.5 text-xs font-bold text-dionysus-text-secondary transition-all hover:border-dionysus-primary/50 sm:gap-1.5 sm:px-3 sm:py-2"
             aria-label="选择 Agent"
             title="选择 Agent"
           >
@@ -229,14 +229,14 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
 
         <button
           type="button"
-          className="rounded-full p-2 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight"
+          className="rounded-full p-1.5 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight sm:p-2"
           aria-label="添加附件"
           title="添加附件"
         >
           <Paperclip className="h-5 w-5" />
         </button>
 
-        <span className="select-none pb-2.5 text-sm text-dionysus-text-secondary">&gt;</span>
+        <span className="select-none pb-2 text-sm text-dionysus-text-secondary sm:pb-2.5">&gt;</span>
 
         <textarea
           ref={textareaRef}
@@ -257,7 +257,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
         <button
           type="button"
           onClick={handleInterrupt}
-          className="rounded-full p-2 text-dionysus-danger transition-colors hover:bg-dionysus-danger/10"
+          className="rounded-full p-1.5 text-dionysus-danger transition-colors hover:bg-dionysus-danger/10 sm:p-2"
           aria-label="中断"
           title="中断"
         >
@@ -268,7 +268,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
           type="button"
           onClick={handleSend}
           disabled={!text.trim()}
-          className="rounded-full bg-dionysus-primary p-2.5 text-white shadow-md transition-all hover:brightness-110 active:translate-y-px disabled:opacity-50"
+          className="rounded-full bg-dionysus-primary p-2 text-white shadow-md transition-all hover:brightness-110 active:translate-y-px disabled:opacity-50 sm:p-2.5"
           aria-label="发送"
         >
           <Send className="h-5 w-5" />
