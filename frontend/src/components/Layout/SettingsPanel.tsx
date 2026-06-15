@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Palette, User, Bot, Save, Check, Upload } from 'lucide-react'
+import { X, Palette, User, Bot, Save, Check, Upload, Layers, Monitor } from 'lucide-react'
 import { useSettingsStore, type StylePreset, type FontSize } from '@/stores/settingsStore'
 import { useLive2DStore } from '@/stores/live2dStore'
 import { panelWidthClasses } from '@/lib/layout'
