@@ -178,12 +178,14 @@ class SessionStore:
             await conn.execute(
                 """
                 UPDATE sessions
-                SET title = ?, persona_id = ?, status = ?, updated_at = ?
+                SET title = ?, persona_id = ?, adapter_id = ?, working_dir = ?, status = ?, updated_at = ?
                 WHERE id = ?
                 """,
                 (
                     session.title,
                     session.persona_id,
+                    session.adapter_id,
+                    session.working_dir,
                     session.status.value,
                     _dt_to_iso(session.updated_at),
                     session.id,

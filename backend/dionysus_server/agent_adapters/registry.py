@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 import structlog
@@ -116,6 +117,30 @@ class AdapterRegistry:
                 f"Unknown or disabled agent adapter: {resolved_id!r}"
             )
         return self._adapters[resolved_id]
+
+    def create_adapter(
+        self, adapter_id: str | None = None, working_dir: str | None = None
+    ) -> IAgentAdapter:
+        """Create a fresh adapter instance for a specific session.
+
+        The global configuration is copied so that per-session overrides such as
+        ``working_dir`` do not leak to other sessions.
+        """
+        resolved_id = adapter_id or self._config.default
+        cfg = self._config.adapters.get(resolved_id)
+        if cfg is None:
+            raise ValueError(
+                f"Unknown or disabled agent adapter: {resolved_id!r}"
+            )
+        session_cfg = deepcopy(cfg)
+        if working_dir is not None:
+            session_cfg["working_dir"] = working_dir
+        adapter = self._build_adapter(resolved_id, session_cfg)
+        if adapter is None:
+            raise ValueError(
+                f"Failed to build agent adapter: {resolved_id!r}"
+            )
+        return adapter
 
     def __repr__(self) -> str:
         return f"AdapterRegistry(adapters={sorted(self._adapters)!r})"
