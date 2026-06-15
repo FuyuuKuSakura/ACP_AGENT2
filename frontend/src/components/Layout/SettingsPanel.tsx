@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Palette, User, Bot, Save, Check, Upload, Layers } from 'lucide-react'
 import { useSettingsStore, type StylePreset, type FontSize } from '@/stores/settingsStore'
-import { useLive2DStore } from '@/stores/live2DStore'
+import { useLive2DStore } from '@/stores/live2dStore'
 import { useChatStore } from '@/stores/chatStore'
 import { panelWidthClasses } from '@/lib/layout'
 import ThemeSwitcher from './ThemeSwitcher'
@@ -543,10 +543,9 @@ interface SessionSettingsTabProps {
   personas: PersonaInfo[]
   adapterOptions: string[]
   sendMessage?: (message: unknown) => boolean
-  onClose?: () => void
 }
 
-function SessionSettingsTab({ personas, adapterOptions, sendMessage, onClose }: SessionSettingsTabProps) {
+function SessionSettingsTab({ personas, adapterOptions, sendMessage }: SessionSettingsTabProps) {
   const { sessions, currentSessionId, renameSession, updateSession } = useChatStore()
   const session = sessions.find((s) => s.id === currentSessionId)
 
