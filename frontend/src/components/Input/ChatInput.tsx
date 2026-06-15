@@ -206,7 +206,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
 
         {/* History popover */}
         {historyOpen && (
-          <div className="absolute inset-x-3 bottom-full mb-2 max-h-60 overflow-y-auto rounded-xl border border-dionysus-glass-border bg-dionysus-glass-bg p-2 shadow-lg backdrop-blur-xl">
+          <div className="absolute inset-x-0 bottom-full mb-2 max-h-60 overflow-y-auto rounded-xl border border-dionysus-glass-border bg-dionysus-glass-bg p-2 shadow-lg backdrop-blur-xl">
             {historyMessages.length === 0 ? (
               <div className="px-2 py-4 text-center text-xs text-dionysus-text-secondary">
                 暂无历史消息
@@ -258,7 +258,6 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
             <Send className="h-6 w-6" />
           </button>
         </div>
-      </div>
     </div>
   )
 }
