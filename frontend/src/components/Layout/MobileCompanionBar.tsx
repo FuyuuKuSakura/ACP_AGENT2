@@ -12,15 +12,14 @@ export default function MobileCompanionBar() {
 
   const statusIcon = () => {
     switch (status) {
-      case 'running':
-      case 'streaming':
-      case 'processing':
+      case 'thinking':
+      case 'reading_file':
+      case 'executing':
+      case 'outputting':
         return <Loader2 className="h-3.5 w-3.5 animate-spin text-elaw-primary" />
-      case 'success':
-      case 'complete':
-        return <CheckCircle2 className="h-3.5 w-3.5 text-elaw-success" />
       case 'error':
         return <XCircle className="h-3.5 w-3.5 text-elaw-danger" />
+      case 'idle':
       default:
         return <Sparkles className="h-3.5 w-3.5 text-elaw-text-secondary" />
     }
