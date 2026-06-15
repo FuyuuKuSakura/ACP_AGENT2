@@ -1,40 +1,34 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X, ChevronDown } from 'lucide-react'
 import { useSettingsStore } from '@/stores/settingsStore'
+import { useLayoutStore } from '@/stores/layoutStore'
 import Live2DViewer from '../Live2D/Live2DViewer'
 import CharacterDialogBox from '../Character/CharacterDialogBox'
 import ToolPanel from '../Tools/ToolPanel'
 
-interface MobileCompanionDrawerProps {
-  isOpen: boolean
-  onClose: () => void
-}
-
-export default function MobileCompanionDrawer({
-  isOpen,
-  onClose,
-}: MobileCompanionDrawerProps) {
+export default function MobileCompanionDrawer() {
   const { live2dEnabled } = useSettingsStore()
+  const { isCompanionDrawerOpen, setCompanionDrawerOpen } = useLayoutStore()
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isCompanionDrawerOpen && (
         <>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/50 lg:hidden"
+            onClick={() => setCompanionDrawerOpen(false)}
+            className="fixed inset-0 z-50 bg-black/50 md:hidden"
             aria-hidden="true"
           />
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: '0%' }}
-            exit={{ y: '100%' }}
+            initial={{ y: '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-3xl border-t-2 border-elaw-subtle-border bg-elaw-panel-bg shadow-2xl lg:hidden"
-            style={{ top: '10%' }}
+            className="fixed inset-x-0 top-0 z-50 flex flex-col rounded-b-3xl border-b-2 border-elaw-subtle-border bg-elaw-panel-bg shadow-2xl md:hidden"
+            style={{ bottom: '10%' }}
             role="dialog"
             aria-modal="true"
             aria-label="角色陪伴"
@@ -45,7 +39,7 @@ export default function MobileCompanionDrawer({
               </h2>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={() => setCompanionDrawerOpen(false)}
                 className="cel-button p-2 text-elaw-text-secondary"
                 aria-label="关闭角色陪伴"
               >
@@ -59,6 +53,14 @@ export default function MobileCompanionDrawer({
               </div>
               <ToolPanel />
             </div>
+            <button
+              type="button"
+              onClick={() => setCompanionDrawerOpen(false)}
+              className="flex items-center justify-center py-2 text-elaw-text-secondary"
+              aria-label="收起"
+            >
+              <ChevronDown className="h-6 w-6" />
+            </button>
           </motion.div>
         </>
       )}
