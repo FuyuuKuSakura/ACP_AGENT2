@@ -8,9 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview --host",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "electron:dev": "echo 'Electron dev placeholder - run after adding electron deps'",
-    "electron:build": "echo 'Electron build placeholder - run after adding electron deps'",
-    "electron:pack": "echo 'Electron pack placeholder - run after adding electron deps'"
+    "electron:dev": "npm run build && electron .",
+    "electron:build": "npm run build && electron-builder",
+    "electron:pack": "npm run build && electron-builder --dir"
   },
   "dependencies": {
     "clsx": "^2.1.0",
