@@ -38,16 +38,21 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
       .catch(() => setAdapterCapabilities({}))
   }, [])
 
+  const defaultAdapterId = useMemo(() => {
+    return (
+      Object.values(adapterCapabilities).find((a) => a.enabled !== false)?.adapter_id ?? ''
+    )
+  }, [adapterCapabilities])
+
   useEffect(() => {
     if (session) {
       setTitle(session.title)
-      setSelectedAdapter((prev) => session.adapter_id ?? prev)
-      const fallback = session.adapter_id
-        ? adapterCapabilities[session.adapter_id]?.working_dir ?? ''
-        : ''
+      const adapterId = session.adapter_id || defaultAdapterId
+      setSelectedAdapter((prev) => adapterId || prev)
+      const fallback = adapterId ? adapterCapabilities[adapterId]?.working_dir ?? '' : ''
       setWorkingDir(session.working_dir ?? fallback)
     }
-  }, [session, adapterCapabilities])
+  }, [session, adapterCapabilities, defaultAdapterId])
 
   const showMessage = (text: string) => {
     setMessage(text)
