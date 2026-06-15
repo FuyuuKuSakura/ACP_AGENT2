@@ -36,7 +36,13 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
     <div className="flex h-full w-full overflow-hidden bg-elaw-background">
       {/* Desktop / tablet: leftmost navigation */}
       <div className="hidden md:flex">
-        <NavSidebar />
+        <NavSidebar
+          onOpenSettings={(tab) => {
+            setSettingsTab(tab)
+            setIsSettingsOpen(true)
+          }}
+          onOpenThemeStudio={() => setIsThemeStudioOpen(true)}
+        />
       </div>
 
       {/* Desktop layout */}
