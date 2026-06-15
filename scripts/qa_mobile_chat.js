@@ -10,7 +10,7 @@ const { chromium } = require('playwright-core');
     deviceScaleFactor: 2,
   });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:8765', { waitUntil: 'networkidle' });
+  await page.goto('http://127.0.0.1:5173', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1500);
   // Click the first session list item to enter chat view
   await page.waitForTimeout(2500);
