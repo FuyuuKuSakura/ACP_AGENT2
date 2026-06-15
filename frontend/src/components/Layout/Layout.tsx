@@ -30,7 +30,9 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
   const [isPersonaOpen, setIsPersonaOpen] = useState(false)
   const [isSystemSettingsOpen, setIsSystemSettingsOpen] = useState(false)
-  const [isSessionSettingsOpen] = useState(true)
+  const [isSessionSettingsOpen, setIsSessionSettingsOpen] = useState(false)
+
+  const toggleSessionSettings = () => setIsSessionSettingsOpen((v) => !v)
 
   const personaCloseGuardRef = useRef<(() => boolean) | null>(null)
 
@@ -83,7 +85,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
         <div className="relative flex min-w-0 flex-1 flex-col">
           <Header
             connected={connected}
-            onSettingsClick={handleOpenSystemSettings}
+            onSettingsClick={toggleSessionSettings}
           />
           <main className="relative flex flex-1 flex-col overflow-hidden">
             <ChatContainer sendMessage={sendMessage} />
