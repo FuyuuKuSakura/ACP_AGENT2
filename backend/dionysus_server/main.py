@@ -199,6 +199,15 @@ def create_app() -> FastAPI:
         scheme = request.headers.get("x-forwarded-proto", "http")
         return JSONResponse(content={"url": f"{scheme}://{host}"})
 
+    @app.get("/api/server/qr")
+    async def server_qr(url: str) -> StreamingResponse:
+        """Generate a PNG QR code for the given URL."""
+        img = qrcode.make(url, box_size=6, border=2)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+        return StreamingResponse(buf, media_type="image/png")
+
     manager = SessionManager(config)
 
     @app.on_event("startup")
