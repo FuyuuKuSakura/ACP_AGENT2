@@ -9,6 +9,13 @@ function isValidTheme(theme: unknown): theme is Theme {
   return !!t.id && !!t.colors && !!t.fonts && !!t.assets
 }
 
+const LEGACY_THEME_IDS = new Set([
+  'exusiai_default',
+  'dark_glass',
+  'dark_default',
+  'paseo_dark',
+])
+
 interface ThemeState {
   currentTheme: Theme
   availableThemes: Theme[]
@@ -40,8 +47,7 @@ export const useThemeStore = create<ThemeState>()(
         // Migrate legacy or stale theme variants to the current default.
         if (
           !isValidTheme(state.currentTheme) ||
-          state.currentTheme.id === 'exusiai_default' ||
-          state.currentTheme.id === 'dark_glass'
+          LEGACY_THEME_IDS.has(state.currentTheme.id)
         ) {
           state.currentTheme = DEFAULT_THEME
         }

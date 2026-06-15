@@ -64,9 +64,6 @@ class SessionStore:
                     updated_at TEXT NOT NULL
                 );
 
-                ALTER TABLE sessions ADD COLUMN IF NOT EXISTS adapter_id TEXT;
-                ALTER TABLE sessions ADD COLUMN IF NOT EXISTS working_dir TEXT;
-
                 CREATE TABLE IF NOT EXISTS messages (
                     id TEXT PRIMARY KEY,
                     session_id TEXT NOT NULL,
@@ -82,6 +79,14 @@ class SessionStore:
                     ON messages(session_id, timestamp);
                 """
             )
+            # SQLite < 3.16 does not support "ADD COLUMN IF NOT EXISTS".
+            cursor = await conn.execute("PRAGMA table_info(sessions)")
+            rows = await cursor.fetchall()
+            columns = {row["name"] for row in rows}
+            if "adapter_id" not in columns:
+                await conn.execute("ALTER TABLE sessions ADD COLUMN adapter_id TEXT")
+            if "working_dir" not in columns:
+                await conn.execute("ALTER TABLE sessions ADD COLUMN working_dir TEXT")
             await conn.commit()
         self._logger.debug("store_initialized")
 
