@@ -85,6 +85,10 @@ export default function NavSidebar({
           )
         })}
       </div>
+
+      <div className="mt-auto">
+        <QRCodeButton />
+      </div>
     </nav>
   )
 }
