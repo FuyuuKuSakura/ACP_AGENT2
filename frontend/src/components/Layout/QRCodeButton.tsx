@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { QrCode, X } from 'lucide-react'
 
 export default function QRCodeButton() {
   const [open, setOpen] = useState(false)
   const [url, setUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [qrSrc, setQrSrc] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -14,20 +14,10 @@ export default function QRCodeButton() {
       .then((data) => {
         const serverUrl = data.url || window.location.origin
         setUrl(serverUrl)
+        setQrSrc(`/api/server/qr?url=${encodeURIComponent(serverUrl)}`)
       })
       .catch(() => setError('无法获取服务地址'))
   }, [open])
-
-  useEffect(() => {
-    if (!open || !url || !canvasRef.current) return
-    import('qrcode')
-      .then((QRCode) => {
-        QRCode.toCanvas(canvasRef.current, url, { width: 180, margin: 2 }, (err: Error | null | undefined) => {
-          if (err) setError('二维码生成失败')
-        })
-      })
-      .catch(() => setError('二维码模块加载失败'))
-  }, [open, url])
 
   return (
     <div className="relative">
@@ -56,7 +46,13 @@ export default function QRCodeButton() {
             <div className="text-xs text-dionysus-danger">{error}</div>
           ) : url ? (
             <>
-              <canvas ref={canvasRef} className="mx-auto rounded-lg" />
+              {qrSrc && (
+                <img
+                  src={qrSrc}
+                  alt="连接二维码"
+                  className="mx-auto block h-44 w-44 rounded-lg bg-white object-contain p-2"
+                />
+              )}
               <div className="mt-2 break-all text-center text-xs text-dionysus-text-secondary">
                 {url}
               </div>
