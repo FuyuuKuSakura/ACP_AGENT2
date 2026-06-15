@@ -237,19 +237,13 @@ function App() {
           className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center"
           style={{
             backgroundImage: `url(${wallpaperUrl})`,
+            opacity: wallpaperOpacity,
             filter: `blur(${wallpaperBlur}px) brightness(${wallpaperBrightness})`,
             transform: 'scale(1.05)',
           }}
           aria-hidden="true"
         />
       )}
-
-      {/* Wallpaper overlay mask */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0 bg-dionysus-background"
-        style={{ opacity: 1 - wallpaperOpacity }}
-        aria-hidden="true"
-      />
 
       {/* Application content */}
       <div className="relative z-10 h-full w-full">
