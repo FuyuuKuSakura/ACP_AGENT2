@@ -149,10 +149,10 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   }
 
   const iconButtonClass =
-    'rounded-lg p-1.5 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight hover:text-dionysus-text-primary'
+    'rounded-lg p-1 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight hover:text-dionysus-text-primary'
 
   const activeIconClass =
-    'rounded-lg p-1.5 text-dionysus-primary transition-colors hover:bg-dionysus-glass-highlight'
+    'rounded-lg p-1 text-dionysus-primary transition-colors hover:bg-dionysus-glass-highlight'
 
   const historyMessages = messages.slice(-historyLimit)
 
