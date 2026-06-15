@@ -31,7 +31,7 @@ export default function QRCodeButton() {
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-0 mb-2 w-64 rounded-2xl border border-dionysus-glass-border bg-dionysus-glass-bg p-4 shadow-xl backdrop-blur-xl">
+        <div className="absolute left-full bottom-0 ml-2 w-64 rounded-2xl border border-dionysus-glass-border bg-dionysus-glass-bg p-4 shadow-xl backdrop-blur-xl">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-semibold text-dionysus-text-primary">扫码连接</span>
             <button
