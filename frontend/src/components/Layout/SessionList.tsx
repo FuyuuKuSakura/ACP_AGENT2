@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Plus, Trash2, X, MessageSquare, Pencil } from 'lucide-react'
+import { Plus, Trash2, MessageSquare, Pencil } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLayoutStore } from '@/stores/layoutStore'
 import type { Session } from '@/types/protocol'

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-type NavItem = 'sessions' | 'themes' | 'character' | 'settings'
+export type NavItem = 'sessions' | 'themes' | 'character' | 'settings'
 type MobileView = 'session-list' | 'chat'
 
 interface LayoutState {
