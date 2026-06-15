@@ -59,6 +59,10 @@ export default function SystemSettingsPage() {
 
   const saveAgent = async () => {
     if (!agentConfig) return
+    if (adapterWorkingDir !== originalWorkingDir) {
+      const confirmed = window.confirm('修改全局 working_dir 会影响所有会话，确定要继续吗？')
+      if (!confirmed) return
+    }
     setSaving(true)
     setMessage(null)
     try {
@@ -131,7 +135,7 @@ export default function SystemSettingsPage() {
         <input
           type="text"
           value={adapterWorkingDir}
-          onChange={(e) => handleWorkingDirChange(e.target.value)}
+          onChange={(e) => setAdapterWorkingDir(e.target.value)}
           className="mb-3 w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
           placeholder="/Users/..."
         />
