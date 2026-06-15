@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        elaw: {
+        dionysus: {
           primary: 'var(--dionysus-primary)',
           'primary-hover': 'var(--dionysus-primary-hover)',
           accent: 'var(--dionysus-accent)',
