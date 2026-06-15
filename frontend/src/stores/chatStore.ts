@@ -41,6 +41,7 @@ interface ChatState {
   setCurrentSession: (sessionId: string) => void
   deleteSession: (sessionId: string) => void
   renameSession: (sessionId: string, title: string) => void
+  updateSession: (sessionId: string, patch: Partial<Session>) => void
   addUserMessage: (text: string, attachments?: unknown[]) => ChatMessage
   addAgentChunk: (chunk: string) => void
   finalizeAgentMessage: (status?: 'complete' | 'interrupted' | 'error') => void
@@ -142,6 +143,16 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         s.id === sessionId ? { ...s, title, updated_at: Date.now() } : s,
       ),
     }))
+  },
+
+  updateSession: (sessionId, patch) => {
+    set((state) => {
+      const sessions = state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, ...patch, updated_at: Date.now() } : s,
+      )
+      const current = sessions.find((s) => s.id === state.currentSessionId)
+      return { sessions, messages: current?.messages ?? state.messages }
+    })
   },
 
   addUserMessage: (text, attachments) => {
