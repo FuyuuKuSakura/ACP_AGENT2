@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import json
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,28 @@ from dionysus_server.websocket.connection import WSConnection
 from dionysus_server.websocket.handler import MessageHandler
 
 logger = structlog.get_logger()
+
+
+def _server_settings_path() -> Path:
+    return Path(__file__).parent.parent / "data" / "server_settings.json"
+
+
+def _load_server_settings(config: Any) -> None:
+    path = _server_settings_path()
+    if not path.exists():
+        return
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if "history_limit" in data:
+            config.sessions.history_limit = int(data["history_limit"])
+    except Exception as exc:
+        logger.warning("failed_to_load_server_settings", error=str(exc))
+
+
+def _save_server_settings(data: dict[str, Any]) -> None:
+    path = _server_settings_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def configure_logging() -> None:
@@ -46,6 +69,7 @@ def create_app() -> FastAPI:
     """Build and configure the FastAPI application."""
     configure_logging()
     config = load_config()
+    _load_server_settings(config)
 
     app = FastAPI(title="Dionysus Server", version="0.1.0")
     theme_dir = get_config_dir() / "themes"
