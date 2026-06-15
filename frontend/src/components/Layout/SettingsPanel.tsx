@@ -10,6 +10,7 @@ interface SettingsPanelProps {
   isOpen: boolean
   onClose: () => void
   onOpenThemeStudio?: () => void
+  initialTab?: Tab
 }
 
 type Tab = 'appearance' | 'persona' | 'agent'
@@ -31,7 +32,7 @@ interface AdapterCapability {
   supports_model: boolean
 }
 
-export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio }: SettingsPanelProps) {
+export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, initialTab }: SettingsPanelProps) {
   const { live2dEnabled, stylePreset, fontSize, setLive2dEnabled, setStylePreset, setFontSize } =
     useSettingsStore()
   const { setTrackingEnabled } = useLive2DStore()
