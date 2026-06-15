@@ -13,7 +13,7 @@ export default defineConfig({
           VitePWA({
             registerType: 'autoUpdate',
             manifest: {
-              name: 'Dionysus - Exusiai Agent',
+              name: 'Dionysus',
               short_name: 'Dionysus',
               start_url: '/',
               display: 'standalone',
