@@ -157,8 +157,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   const historyMessages = messages.slice(-historyLimit)
 
   return (
-    <div className="relative flex flex-col border-t border-dionysus-glass-border/30 px-4 py-5">
-      <div className="relative border border-dionysus-glass-border/50 bg-dionysus-background/40 px-2 py-2 backdrop-blur-xl dark:border-dionysus-glass-border/40">
+    <div className="relative flex flex-col border border-dionysus-glass-border/50 bg-dionysus-background/40 px-3 py-2 backdrop-blur-xl dark:border-dionysus-glass-border/40">
         {/* Top toolbar */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-0.5">
