@@ -24,7 +24,8 @@ function isServerMessage(data: unknown): data is ServerMessage {
 
 function App() {
   const { currentTheme } = useThemeStore()
-  const { fontSize } = useSettingsStore()
+  const { fontSize, wallpaperUrl, wallpaperOpacity, wallpaperBlur, wallpaperBrightness } =
+    useSettingsStore()
 
   useEffect(() => {
     applyTheme(currentTheme ?? DEFAULT_THEME)
@@ -228,7 +229,34 @@ function App() {
     [wsSend],
   )
 
-  return <Layout sendMessage={sendMessage} connected={connected} />
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-dionysus-background">
+      {/* Wallpaper layer */}
+      {wallpaperUrl && (
+        <div
+          className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${wallpaperUrl})`,
+            filter: `blur(${wallpaperBlur}px) brightness(${wallpaperBrightness})`,
+            transform: 'scale(1.05)',
+          }}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Wallpaper overlay mask */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 bg-dionysus-background"
+        style={{ opacity: 1 - wallpaperOpacity }}
+        aria-hidden="true"
+      />
+
+      {/* Application content */}
+      <div className="relative z-10 h-full w-full">
+        <Layout sendMessage={sendMessage} connected={connected} />
+      </div>
+    </div>
+  )
 }
 
 export default App
