@@ -7,7 +7,7 @@ server:
 
 sessions:
   max_concurrent: 5
-  history_limit: 100
+  history_limit: 50
   storage_backend: "sqlite"
   storage_path: "./data/sessions.db"
   ttl_seconds: 86400
@@ -54,7 +54,7 @@ agent_adapter:
       restart_on_crash: true
       max_restart_attempts: 3
       request_timeout_seconds: 600
-      enabled: false
+      enabled: true
 
 emotion:
   method: "keyword"

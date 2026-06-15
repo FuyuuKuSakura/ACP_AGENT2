@@ -29,6 +29,10 @@ def _server_settings_path() -> Path:
     return Path(__file__).parent.parent / "data" / "server_settings.json"
 
 
+def _agent_settings_path() -> Path:
+    return Path(__file__).parent.parent / "data" / "agent_settings.json"
+
+
 def _load_server_settings(config: Any) -> None:
     path = _server_settings_path()
     if not path.exists():
@@ -41,8 +45,28 @@ def _load_server_settings(config: Any) -> None:
         logger.warning("failed_to_load_server_settings", error=str(exc))
 
 
+def _load_agent_settings(config: Any) -> None:
+    path = _agent_settings_path()
+    if not path.exists():
+        return
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for adapter_id, overrides in data.items():
+            cfg = config.agent_adapter.adapters.get(adapter_id)
+            if cfg is not None:
+                cfg.update(overrides)
+    except Exception as exc:
+        logger.warning("failed_to_load_agent_settings", error=str(exc))
+
+
 def _save_server_settings(data: dict[str, Any]) -> None:
     path = _server_settings_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _save_agent_settings(data: dict[str, Any]) -> None:
+    path = _agent_settings_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -70,6 +94,7 @@ def create_app() -> FastAPI:
     configure_logging()
     config = load_config()
     _load_server_settings(config)
+    _load_agent_settings(config)
 
     app = FastAPI(title="Dionysus Server", version="0.1.0")
     theme_dir = get_config_dir() / "themes"
@@ -198,9 +223,10 @@ def create_app() -> FastAPI:
     async def update_agent_settings(request: Request) -> JSONResponse:
         """Update agent adapter configuration and restart affected adapters."""
         body = await request.json()
+
+        # Legacy single-adapter update.
         adapter_id = body.get("adapter_id")
         updates = body.get("updates", {})
-
         if adapter_id and updates:
             ok = await manager.update_adapter_config(adapter_id, updates)
             if not ok:
@@ -208,12 +234,56 @@ def create_app() -> FastAPI:
                     status_code=400, content={"error": "unknown_adapter"}
                 )
 
+        # Batch adapter updates (used by the multi-agent settings UI).
+        adapters = body.get("adapters", {})
+        for aid, cfg_updates in adapters.items():
+            ok = await manager.update_adapter_config(aid, cfg_updates)
+            if not ok:
+                return JSONResponse(
+                    status_code=400, content={"error": f"unknown_adapter: {aid}"}
+                )
+
         new_default = body.get("default")
         if new_default:
             config.agent_adapter.default = new_default
 
+        # Persist overrides so they survive restart.
+        override: dict[str, Any] = {}
+        for aid, cfg in config.agent_adapter.adapters.items():
+            override[aid] = {
+                k: v
+                for k, v in cfg.items()
+                if k in ("command", "model", "enabled", "working_dir")
+            }
+        _save_agent_settings(override)
+
         return JSONResponse(
             content={"ok": True, "default": config.agent_adapter.default}
+        )
+
+    @app.get("/api/settings/server")
+    async def get_server_settings() -> JSONResponse:
+        """Return mutable server-level settings."""
+        return JSONResponse(
+            content={
+                "history_limit": config.sessions.history_limit,
+            }
+        )
+
+    @app.post("/api/settings/server")
+    async def update_server_settings(request: Request) -> JSONResponse:
+        """Update server-level settings and persist override."""
+        body = await request.json()
+        if "history_limit" in body:
+            try:
+                config.sessions.history_limit = max(1, int(body["history_limit"]))
+            except (ValueError, TypeError):
+                return JSONResponse(
+                    status_code=400, content={"error": "invalid_history_limit"}
+                )
+        _save_server_settings({"history_limit": config.sessions.history_limit})
+        return JSONResponse(
+            content={"ok": True, "history_limit": config.sessions.history_limit}
         )
 
     @app.get("/api/server/info")
