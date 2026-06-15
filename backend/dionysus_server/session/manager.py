@@ -172,15 +172,21 @@ class SessionManager:
     async def get_or_create_adapter(self, session_id: str) -> IAgentAdapter:
         """Return the adapter for a session, creating and starting it if needed."""
         if session_id not in self._session_adapters:
-            adapter_id = self._session_adapter_ids.get(
-                session_id, self._config.agent_adapter.default
-            )
-            adapter = self.adapters.get_adapter(adapter_id)
+            session = await self.get_session(session_id)
+            adapter_id = self._config.agent_adapter.default
+            working_dir: str | None = None
+            if session is not None:
+                adapter_id = session.adapter_id or adapter_id
+                working_dir = session.working_dir
+            adapter = self.adapters.create_adapter(adapter_id, working_dir)
             await adapter.start()
             self._session_adapters[session_id] = adapter
             self._session_adapter_ids[session_id] = adapter.agent_id
             self._logger.info(
-                "adapter_started", session_id=session_id, agent_id=adapter.agent_id
+                "adapter_started",
+                session_id=session_id,
+                agent_id=adapter.agent_id,
+                working_dir=working_dir,
             )
         return self._session_adapters[session_id]
 
@@ -499,11 +505,16 @@ class SessionManager:
             )
             return
 
-        adapter_id = self._get_session_adapter_id(session_id)
-        cfg = self._config.agent_adapter.adapters.get(adapter_id)
-        if cfg is not None:
-            cfg["working_dir"] = str(path)
+        session = await self.get_session(session_id)
+        if session is None:
+            yield SystemNoticeMessage(
+                session_id=session_id,
+                payload=SystemNoticePayload(text="会话不存在", level="error"),
+            )
+            return
 
+        session.working_dir = str(path)
+        await self._store.update_session(session)
         await self.close_adapter(session_id)
 
         # Also open the folder in Finder on macOS.
@@ -522,9 +533,12 @@ class SessionManager:
     async def _cmd_open_working_dir(
         self, session_id: str
     ) -> AsyncIterator[ServerMessage]:
-        adapter_id = self._get_session_adapter_id(session_id)
-        cfg = self._config.agent_adapter.adapters.get(adapter_id)
-        working_dir = cfg.get("working_dir", ".") if cfg else "."
+        session = await self.get_session(session_id)
+        working_dir = session.working_dir if session is not None else None
+        if working_dir is None:
+            adapter_id = self._get_session_adapter_id(session_id)
+            cfg = self._config.agent_adapter.adapters.get(adapter_id)
+            working_dir = cfg.get("working_dir", ".") if cfg else "."
         path = Path(working_dir).expanduser().resolve()
         try:
             subprocess.Popen(["open", str(path)])
