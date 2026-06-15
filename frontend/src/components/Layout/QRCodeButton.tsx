@@ -4,21 +4,10 @@ import { QrCode, X } from 'lucide-react'
 
 export default function QRCodeButton() {
   const [open, setOpen] = useState(false)
-  const [url, setUrl] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const [pos, setPos] = useState<{ bottom: number; left: number } | null>(null)
 
-  useEffect(() => {
-    if (!open) return
-    fetch('/api/server/info')
-      .then((r) => r.json())
-      .then((data) => {
-        const serverUrl = data.url || window.location.origin
-        setUrl(serverUrl)
-      })
-      .catch(() => setError('无法获取服务地址'))
-  }, [open])
+  const url = typeof window !== 'undefined' ? window.location.origin : ''
 
   useEffect(() => {
     if (!open || !buttonRef.current) return
@@ -38,6 +27,15 @@ export default function QRCodeButton() {
     }
   }, [open])
 
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
   const popup = (
     <div
       className="fixed z-[200] w-64 rounded-2xl border border-dionysus-glass-border bg-dionysus-glass-bg p-4 shadow-xl backdrop-blur-xl"
@@ -53,9 +51,7 @@ export default function QRCodeButton() {
           <X className="h-4 w-4" />
         </button>
       </div>
-      {error ? (
-        <div className="text-xs text-dionysus-danger">{error}</div>
-      ) : url ? (
+      {url ? (
         <>
           <img
             src={`/api/server/qr?url=${encodeURIComponent(url)}`}
@@ -67,7 +63,7 @@ export default function QRCodeButton() {
           </div>
         </>
       ) : (
-        <div className="py-4 text-center text-xs text-dionysus-text-secondary">加载中…</div>
+        <div className="py-4 text-center text-xs text-dionysus-text-secondary">无法获取地址</div>
       )}
     </div>
   )
