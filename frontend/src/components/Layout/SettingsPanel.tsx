@@ -38,6 +38,13 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
   const { setTrackingEnabled } = useLive2DStore()
 
   const [activeTab, setActiveTab] = useState<Tab>('appearance')
+
+  useEffect(() => {
+    if (isOpen && initialTab) {
+      setActiveTab(initialTab)
+    }
+  }, [isOpen, initialTab])
+
   const [personas, setPersonas] = useState<PersonaInfo[]>([])
   const [selectedPersona, setSelectedPersona] = useState<string>('exusiai')
   const [personaYaml, setPersonaYaml] = useState<string>('')
