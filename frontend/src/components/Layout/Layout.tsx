@@ -86,6 +86,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
           <Header
             connected={connected}
             onSettingsClick={toggleSessionSettings}
+            settingsActive={isSessionSettingsOpen}
           />
           <main className="relative flex flex-1 flex-col overflow-hidden">
             <ChatContainer sendMessage={sendMessage} />

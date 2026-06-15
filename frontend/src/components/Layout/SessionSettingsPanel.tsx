@@ -8,36 +8,25 @@ interface SessionSettingsPanelProps {
   className?: string
 }
 
-interface PersonaInfo {
-  id: string
-  name?: string
-}
-
 interface AdapterCapability {
   adapter_id: string
   enabled: boolean
   supports_model: boolean
+  working_dir?: string
 }
 
 export default function SessionSettingsPanel({ sendMessage, className = '' }: SessionSettingsPanelProps) {
   const { sessions, currentSessionId, renameSession, updateSession } = useChatStore()
   const session = sessions.find((s) => s.id === currentSessionId)
 
-  const [personas, setPersonas] = useState<PersonaInfo[]>([])
   const [adapterCapabilities, setAdapterCapabilities] = useState<Record<string, AdapterCapability>>({})
 
   const [title, setTitle] = useState(session?.title ?? '')
   const [workingDir, setWorkingDir] = useState(session?.working_dir ?? '')
-  const [selectedPersona, setSelectedPersona] = useState(session?.persona_id ?? 'exusiai')
   const [selectedAdapter, setSelectedAdapter] = useState(session?.adapter_id ?? '')
   const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/personas')
-      .then((r) => r.json())
-      .then((data) => setPersonas(Array.isArray(data) ? data : []))
-      .catch(() => setPersonas([]))
-
     fetch('/api/adapters')
       .then((r) => r.json())
       .then((data: Record<string, AdapterCapability>) => {
@@ -52,11 +41,13 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
   useEffect(() => {
     if (session) {
       setTitle(session.title)
-      setSelectedPersona(session.persona_id)
-      setWorkingDir(session.working_dir ?? '')
       setSelectedAdapter((prev) => session.adapter_id ?? prev)
+      const fallback = session.adapter_id
+        ? adapterCapabilities[session.adapter_id]?.working_dir ?? ''
+        : ''
+      setWorkingDir(session.working_dir ?? fallback)
     }
-  }, [session])
+  }, [session, adapterCapabilities])
 
   const showMessage = (text: string) => {
     setMessage(text)
@@ -67,17 +58,6 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
     if (!session || !title.trim()) return
     renameSession(session.id, title.trim())
     showMessage('会话标题已更新')
-  }
-
-  const handlePersonaChange = (id: string) => {
-    if (!session) return
-    setSelectedPersona(id)
-    updateSession(session.id, { persona_id: id })
-    sendMessage?.({
-      type: 'client_command',
-      payload: { command: 'switch_persona', args: id },
-    })
-    showMessage('角色已切换')
   }
 
   const handleSwitchAdapter = () => {
@@ -164,19 +144,6 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
               重命名
             </button>
           </div>
-
-          <label className="mb-1.5 block text-xs text-dionysus-text-secondary">角色</label>
-          <select
-            value={selectedPersona}
-            onChange={(e) => handlePersonaChange(e.target.value)}
-            className="mb-3 w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
-          >
-            {personas.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name || p.id}
-              </option>
-            ))}
-          </select>
 
           <label className="mb-1.5 block text-xs text-dionysus-text-secondary">Adapter</label>
           <div className="mb-3 flex gap-2">

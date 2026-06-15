@@ -130,9 +130,9 @@ export default function Header({ onSettingsClick, showBack = false, connected = 
         <button
           type="button"
           onClick={onSettingsClick}
-          className="cel-button p-2 text-dionysus-text-secondary"
-          aria-label="设置"
-          title="设置"
+          className={`cel-button hidden p-2 md:flex ${settingsActive ? 'text-dionysus-primary' : 'text-dionysus-text-secondary'}`}
+          aria-label="会话设置"
+          title="会话设置"
         >
           <Settings className="h-5 w-5" />
         </button>
