@@ -55,7 +55,7 @@ export default function ToolPanel() {
   const currentStatus = streamingStatus?.detail || streamingStatus?.status
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t-2 border-dionysus-glass-border bg-dionysus-glass-bg/60 p-4 dark:backdrop-blur-md">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t-2 border-dionysus-glass-border bg-transparent p-4 backdrop-blur-md">
       <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
         <Terminal className="h-4 w-4 text-dionysus-primary" />
         执行进度

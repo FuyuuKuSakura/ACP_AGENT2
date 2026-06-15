@@ -45,17 +45,9 @@ export default function ChatContainer({ sendMessage }: ChatContainerProps) {
   return (
     <div
       ref={scrollRef}
-      className="flex flex-1 flex-col overflow-y-auto bg-dionysus-glass-bg scrollbar-thin dark:backdrop-blur-xl"
+      className="flex flex-1 flex-col overflow-y-auto scrollbar-thin"
     >
-      {messages.length === 0 && !isStreaming && (
-        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center text-dionysus-text-secondary">
-          <div className="mb-4 text-4xl">👋</div>
-          <h2 className="mb-2 text-lg font-semibold text-dionysus-text-primary">欢迎来到 Dionysus</h2>
-          <p className="max-w-md text-sm">
-            我是能天使，你的本地 Coding Agent 助手。在下方输入框发送消息，我会通过 Kimi Code CLI 帮你解决问题。
-          </p>
-        </div>
-      )}
+
       <MessageStream messages={messages} />
 
       {isStreaming && !lastIsStreaming && (

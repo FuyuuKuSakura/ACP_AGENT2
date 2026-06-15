@@ -50,7 +50,7 @@ export default function NavSidebar({
 
   return (
     <nav
-      className="flex h-full w-16 flex-shrink-0 flex-col items-center border-r border-dionysus-subtle-border bg-dionysus-glass-bg py-4 backdrop-blur-xl"
+      className="flex h-full w-16 flex-shrink-0 flex-col items-center border-r border-dionysus-subtle-border bg-dionysus-background/80 py-4 backdrop-blur-xl"
       aria-label="主导航"
     >
       <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-dionysus-primary text-lg font-bold text-white shadow-md">
