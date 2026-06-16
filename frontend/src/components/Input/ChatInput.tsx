@@ -157,9 +157,9 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   const historyMessages = messages.slice(-historyLimit)
 
   return (
-    <div className="relative mb-8 flex flex-col border border-transparent bg-dionysus-background/10 px-3 py-16 backdrop-blur-xl">
+    <div className="relative flex min-h-64 flex-col border border-transparent bg-dionysus-background/10 px-3 py-16 backdrop-blur-xl">
         {/* Top toolbar */}
-        <div className="absolute left-3 right-3 top-0.5 flex items-center justify-between">
+        <div className="flex flex-shrink-0 items-center justify-between">
           <div className="flex items-center gap-1">
             <button
               type="button"
@@ -231,7 +231,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
         )}
 
         {/* Textarea */}
-        <div className="absolute inset-x-3 top-16 bottom-16">
+        <div className="mt-1 flex min-h-0 flex-1 flex-col">
           <textarea
             ref={textareaRef}
             value={text}
@@ -245,12 +245,12 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
             }}
             rows={computeRows(text)}
             placeholder="给 Agent 发送消息…"
-            className="max-h-32 min-h-11 h-full w-full resize-none bg-transparent py-2 pr-10 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
+            className="min-h-11 w-full flex-1 resize-none bg-transparent py-2 pr-10 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
           />
         </div>
 
         {/* Input row */}
-        <div className="absolute left-3 right-3 bottom-0.5 flex items-end justify-end gap-2">
+        <div className="flex flex-shrink-0 items-end justify-end gap-2">
           <button
             type="button"
             onClick={handleSend}
