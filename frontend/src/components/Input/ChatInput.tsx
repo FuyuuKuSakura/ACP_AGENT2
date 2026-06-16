@@ -9,11 +9,6 @@ interface ChatInputProps {
 
 export type AgentMode = 'normal' | 'plan' | 'yolo' | 'plan_yolo'
 
-function computeRows(text: string): number {
-  const lines = text.split('\n').length
-  return Math.min(5, Math.max(1, lines))
-}
-
 type ParsedCommand =
   | { type: 'user_input'; text: string; mode?: AgentMode }
   | {
@@ -69,9 +64,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   const historyLimit = useSettingsStore((state) => state.historyLimit)
 
   const resetHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-    }
+    // 固定高度面板：textarea 高度由 CSS 控制，无需手动重置
   }
 
   const toggleMode = (mode: AgentMode) => {
@@ -126,9 +119,6 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value)
-    const target = e.target
-    target.style.height = 'auto'
-    target.style.height = `${Math.min(target.scrollHeight, 5 * 24)}px`
   }
 
   const handleCdClick = () => {
@@ -157,7 +147,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   const historyMessages = messages.slice(-historyLimit)
 
   return (
-    <div className="relative flex min-h-64 flex-col border border-transparent bg-dionysus-background/10 px-3 py-16 backdrop-blur-xl">
+    <div className="relative flex h-32 flex-col border border-transparent bg-dionysus-background/10 px-3 pt-1 pb-2 backdrop-blur-xl">
         {/* Top toolbar */}
         <div className="flex flex-shrink-0 items-center justify-between">
           <div className="flex items-center gap-1">
@@ -231,7 +221,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
         )}
 
         {/* Textarea */}
-        <div className="mt-1 flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <textarea
             ref={textareaRef}
             value={text}
@@ -243,9 +233,9 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
             onCompositionEnd={() => {
               isComposingRef.current = false
             }}
-            rows={computeRows(text)}
+            rows={1}
             placeholder="给 Agent 发送消息…"
-            className="min-h-11 w-full flex-1 resize-none bg-transparent py-2 pr-10 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
+            className="h-full w-full resize-none overflow-y-auto bg-transparent py-1 pr-10 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
           />
         </div>
 
