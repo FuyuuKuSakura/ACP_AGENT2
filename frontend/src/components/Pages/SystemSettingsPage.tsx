@@ -268,6 +268,29 @@ export default function SystemSettingsPage() {
         </button>
       </section>
 
+      <section className="border-t border-dionysus-subtle-border pt-4">
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              const res = await fetch('/api/open-cc-switch', { method: 'POST' })
+              const data = await res.json()
+              if (data.success) {
+                showMessage('已打开 CC Switch')
+              } else {
+                showMessage(`打开失败：${data.error || '未知错误'}`)
+              }
+            } catch {
+              showMessage('打开失败：无法调用后端')
+            }
+          }}
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-text-secondary transition-colors hover:border-dionysus-primary/50 hover:text-dionysus-primary"
+        >
+          <img src="/ccswitch_icon.png" alt="CC Switch" className="h-5 w-5 rounded-md object-cover" />
+          打开 CC Switch
+        </button>
+      </section>
+
       <section>
         <div className="rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2.5 text-xs text-dionysus-text-secondary">
           Dionysus v0.1.0 · By FuyuuKu樱

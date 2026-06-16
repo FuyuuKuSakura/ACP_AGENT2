@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -353,6 +354,29 @@ def create_app() -> FastAPI:
         finally:
             await manager.close_adapter(connection.session_id or session.id)
             await connection.close()
+
+    @app.post("/api/open-cc-switch")
+    async def open_cc_switch() -> JSONResponse:
+        """Open the local CC Switch application (macOS)."""
+        try:
+            subprocess.run(
+                ["open", "/Applications/CC Switch.app"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            return JSONResponse({"success": True})
+        except subprocess.CalledProcessError as exc:
+            logger.warning("open_cc_switch_failed", stderr=exc.stderr)
+            return JSONResponse(
+                {"success": False, "error": exc.stderr or "无法打开 CC Switch"},
+                status_code=500,
+            )
+        except FileNotFoundError:
+            return JSONResponse(
+                {"success": False, "error": "未找到 open 命令或 CC Switch.app"},
+                status_code=500,
+            )
 
     # Mount static files last so API/WebSocket routes take precedence.
     static_dir = Path(config.server.static_dir)

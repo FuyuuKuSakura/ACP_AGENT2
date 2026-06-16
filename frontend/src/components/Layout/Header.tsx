@@ -22,8 +22,9 @@ export default function Header({ onSettingsClick, showBack = false, connected = 
     fetchAdapters()
   }, [fetchAdapters])
 
+  const sessionAdapterId = currentSession?.adapter_id ?? currentAdapter
   const currentAdapterLabel =
-    availableAdapters.find((a) => a.adapter_id === currentAdapter)?.adapter_id ?? currentAdapter
+    availableAdapters.find((a) => a.adapter_id === sessionAdapterId)?.adapter_id ?? sessionAdapterId
 
   return (
     <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-dionysus-glass-border bg-dionysus-background/10 px-4 backdrop-blur-xl">

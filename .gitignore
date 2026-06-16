@@ -25,6 +25,26 @@ backend/*.sqlite3
  # Build artifacts
 dist/
 build/
+frontend/release/
+
+ # QA / test artifacts
+qa_screenshots/
+usr_test_screenshote_round3/
+usr_test_screenshots_round1/
+usr_test_screenshots_round2/
+screenshot_description.png
+qa_reports/*.txt
+qa_reports/*.json
+
+ # Source icons already copied to frontend/public
+/ccswitch_icon.png
+/new_icon.png
+
+ # One-off screenshots used during development
+/frontend_screenshot_*.png
+/mobile_screenshot_*.png
+/usr_screenshot*.png
+/usrtest_screenshot*.png
 
  # IDE
 .vscode/

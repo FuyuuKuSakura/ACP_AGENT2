@@ -37,9 +37,8 @@ class CodexStrategy(JSONStreamStrategy):
 
         args = ["exec", "--json", "--ephemeral", "--sandbox", "workspace-write"]
 
-        model = config.get("model")
-        if model:
-            args.extend(["--model", model])
+        # Codex `exec` does not expose a --model flag; model is kept in config
+        # purely for display in the settings UI.
 
         if mode in ("yolo", "plan_yolo"):
             args.append("--dangerously-bypass-approvals-and-sandbox")
