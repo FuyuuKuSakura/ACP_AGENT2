@@ -48,7 +48,7 @@ agent_adapter:
     opencode_cli:
       type: "opencode_cli"
       strategy: "opencode"
-      command: "/Users/fuyuuku/ACP_AGENT2/node_modules/.bin/opencode"
+      command: "opencode"
       output_format: "json"
       working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
       restart_on_crash: true
