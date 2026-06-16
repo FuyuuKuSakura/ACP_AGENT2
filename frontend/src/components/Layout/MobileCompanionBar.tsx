@@ -4,8 +4,9 @@ import { useLayoutStore } from '@/stores/layoutStore'
 
 export default function MobileCompanionBar() {
   const { setCompanionDrawerOpen } = useLayoutStore()
-  const { streamingStatus, todos, companionLine } = useChatStore()
+  const { streamingStatus, sessionTodos, currentSessionId, companionLine } = useChatStore()
 
+  const todos = currentSessionId ? sessionTodos[currentSessionId] ?? [] : []
   const latestTodo = todos[todos.length - 1]
   const status = streamingStatus?.status ?? 'idle'
   const detail = streamingStatus?.detail ?? latestTodo?.text ?? companionLine ?? '点击展开角色陪伴'

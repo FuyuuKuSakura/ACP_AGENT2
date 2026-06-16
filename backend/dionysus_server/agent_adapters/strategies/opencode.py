@@ -39,8 +39,8 @@ class OpenCodeStrategy(JSONStreamStrategy):
         args = ["run", "--format", output_format]
 
         model = config.get("model")
-        if model:
-            args.extend(["--model", model])
+        if isinstance(model, str) and model.strip():
+            args.extend(["--model", model.strip()])
 
         working_dir = config.get("working_dir")
         if working_dir:

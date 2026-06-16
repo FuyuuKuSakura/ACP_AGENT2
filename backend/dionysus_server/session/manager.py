@@ -137,6 +137,9 @@ class SessionManager:
         self._companion_scheduler = CompanionScheduler()
         self._supervisor: CompanionSupervisor | None = None
         self._supervisor_adapter: IAgentAdapter | None = None
+        # Multiple WebSocket connections may be active (multi-tab).  Keep a
+        # callback per connection so supervisor broadcasts reach every client.
+        self._broadcast_callbacks: dict[str, Any] = {}
         self._logger = logger.bind(component="SessionManager")
 
     async def init(self) -> None:
@@ -154,12 +157,22 @@ class SessionManager:
     async def _emit_supervisor_message(
         self, session_id: str, message: ServerMessage
     ) -> None:
-        """Forward supervisor messages to the active WebSocket connection."""
-        # The WebSocket handler injects itself as the emit target by setting
-        # ``broadcast_callback`` after the manager is created.
-        callback = getattr(self, "broadcast_callback", None)
-        if callback is not None:
-            await callback(message)
+        """Forward supervisor messages to all active WebSocket connections."""
+        for callback in list(self._broadcast_callbacks.values()):
+            try:
+                await callback(message)
+            except Exception:
+                self._logger.warning("supervisor_broadcast_failed", session_id=session_id)
+
+    def register_broadcast_callback(
+        self, connection_id: str, callback: Any
+    ) -> None:
+        """Register a connection-specific broadcast callback."""
+        self._broadcast_callbacks[connection_id] = callback
+
+    def unregister_broadcast_callback(self, connection_id: str) -> None:
+        """Remove a connection-specific broadcast callback."""
+        self._broadcast_callbacks.pop(connection_id, None)
 
     async def update_supervisor_config(self, config: SupervisorConfig) -> None:
         """Update the supervisor configuration and persist it."""

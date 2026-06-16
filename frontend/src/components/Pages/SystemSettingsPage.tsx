@@ -233,7 +233,7 @@ export default function SystemSettingsPage() {
                       value={cfg.model}
                       onChange={(e) => updateEdit(id, { model: e.target.value })}
                       className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-bg px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
-                      placeholder="例如 claude-sonnet-4 / gpt-5.4"
+                      placeholder="留空使用 Agent CLI 默认模型"
                     />
                   </>
                 )}

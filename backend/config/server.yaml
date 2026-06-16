@@ -30,7 +30,7 @@ agent_adapter:
       type: "claude_code_cli"
       strategy: "claude"
       command: "claude"
-      model: "claude-sonnet-4-20250514"
+      model: ""
       output_format: "stream-json"
       working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
       restart_on_crash: true
@@ -41,7 +41,7 @@ agent_adapter:
       type: "codex_cli"
       strategy: "codex"
       command: "codex"
-      model: "gpt-4o"
+      model: ""
       working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
       restart_on_crash: true
       max_restart_attempts: 3
@@ -51,7 +51,7 @@ agent_adapter:
       type: "opencode_cli"
       strategy: "opencode"
       command: "opencode"
-      model: "gpt-4o"
+      model: ""
       output_format: "json"
       working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
       restart_on_crash: true

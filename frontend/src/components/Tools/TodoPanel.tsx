@@ -3,7 +3,10 @@ import { motion } from 'framer-motion'
 import { useChatStore } from '@/stores/chatStore'
 
 export default function TodoPanel() {
-  const todos = useChatStore((state) => state.todos)
+  const todos = useChatStore((state) => {
+    const sessionId = state.currentSessionId
+    return sessionId ? state.sessionTodos[sessionId] ?? [] : state.todos
+  })
   const isStreaming = useChatStore((state) => state.isStreaming)
 
   if (todos.length === 0 && !isStreaming) {

@@ -6,6 +6,7 @@ import io
 import json
 import shutil
 import subprocess
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -202,6 +203,7 @@ def create_app() -> FastAPI:
             "companion": {
                 "live2d": {
                     "model_path": "",
+                    "scale": 1.0,
                     "default_expression": "原皮",
                     "expressions": {
                         "happy": "微笑",
@@ -534,6 +536,42 @@ def create_app() -> FastAPI:
 
         return JSONResponse(content={"ok": True})
 
+    @app.post("/api/personas/{persona_id}/live2d/scale")
+    async def set_persona_live2d_scale(persona_id: str, request: Request) -> JSONResponse:
+        """Persist the per-persona Live2D scale factor."""
+        try:
+            body = await request.json()
+        except Exception as exc:
+            return JSONResponse(
+                status_code=400, content={"error": "invalid_json", "detail": str(exc)}
+            )
+        try:
+            scale = float(body.get("scale", 1.0))
+        except (ValueError, TypeError):
+            return JSONResponse(status_code=400, content={"error": "invalid_scale"})
+        scale = max(0.1, min(3.0, scale))
+
+        persona_path = _ensure_runtime_persona_yaml(persona_id)
+        if not persona_path.exists():
+            return JSONResponse(status_code=404, content={"error": "persona_not_found"})
+        try:
+            yaml_text = persona_path.read_text(encoding="utf-8")
+            parsed = yaml.safe_load(yaml_text) or {}
+            companion = parsed.setdefault("companion", {})
+            live2d_cfg = companion.setdefault("live2d", {})
+            live2d_cfg["scale"] = scale
+            persona_path.write_text(
+                yaml.dump(parsed, allow_unicode=True, sort_keys=False),
+                encoding="utf-8",
+            )
+        except Exception as exc:
+            logger.warning("set_live2d_scale_failed", error=str(exc))
+            return JSONResponse(
+                status_code=500,
+                content={"error": "save_failed", "detail": str(exc)},
+            )
+        return JSONResponse(content={"ok": True, "scale": scale})
+
     @app.get("/api/settings/agent")
     async def get_agent_settings() -> JSONResponse:
         """Return current agent adapter configuration."""
@@ -703,14 +741,16 @@ def create_app() -> FastAPI:
 
         handler = MessageHandler(manager, connection, on_new_session=on_new_session)
 
-        # Bind the active connection so supervisor broadcasts reach the client.
+        # Bind this connection so supervisor broadcasts reach the client.
+        # Use a unique connection id to support multi-tab/multi-client broadcasts.
+        connection_id = str(uuid.uuid4())
         async def broadcast_callback(message: ServerMessage) -> None:
             try:
                 await connection.send_message(message)
             except Exception:
                 pass
 
-        manager.broadcast_callback = broadcast_callback
+        manager.register_broadcast_callback(connection_id, broadcast_callback)
 
         await connection.accept(session)
 
@@ -723,7 +763,7 @@ def create_app() -> FastAPI:
         except WebSocketDisconnect:
             logger.info("websocket_disconnected", session_id=connection.session_id)
         finally:
-            manager.broadcast_callback = None
+            manager.unregister_broadcast_callback(connection_id)
             await manager.close_adapter(connection.session_id or session.id)
             await connection.close()
 

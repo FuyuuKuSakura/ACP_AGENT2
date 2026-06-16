@@ -24,8 +24,14 @@ function isServerMessage(data: unknown): data is ServerMessage {
 
 function App() {
   const { currentTheme } = useThemeStore()
-  const { fontSize, wallpaperUrl, wallpaperOpacity, wallpaperBlur, wallpaperBrightness } =
-    useSettingsStore()
+  const {
+    fontSize,
+    wallpaperUrl,
+    wallpaperOpacity,
+    wallpaperBlur,
+    wallpaperBrightness,
+    initWallpaperFromServer,
+  } = useSettingsStore()
 
   useEffect(() => {
     applyTheme(currentTheme ?? DEFAULT_THEME)
@@ -35,6 +41,10 @@ function App() {
     const root = document.documentElement
     root.setAttribute('data-font-size', fontSize)
   }, [fontSize])
+
+  useEffect(() => {
+    initWallpaperFromServer()
+  }, [initWallpaperFromServer])
 
   // Expose store for end-to-end / smoke testing only in development builds.
   if (import.meta.env.DEV) {
@@ -86,6 +96,10 @@ function App() {
 
     const message = data as WebSocketMessage
     const store = useChatStore.getState()
+    const currentSessionId = store.currentSessionId
+    const targetSessionId =
+      message.session_id === 'global' ? currentSessionId : message.session_id
+    const isCurrentSession = targetSessionId === currentSessionId
 
     switch (message.type) {
       case 'handshake': {
@@ -103,31 +117,47 @@ function App() {
         break
       }
       case 'agent_stream': {
-        store.setStreaming(true)
-        store.setSessionStatus('streaming')
-        store.setStreamingStatus({
-          status: message.payload.status,
-          detail: '',
-        })
-        const toolChunk = parseToolChunk(message.payload.chunk)
-        if (toolChunk?.type === 'tool_call' && toolChunk.call) {
-          store.addToolCall({ name: toolChunk.call.name, args: toolChunk.call.args })
-        } else if (toolChunk?.type === 'tool_result') {
-          store.updateActiveToolResult(toolChunk.result ?? '')
-        } else {
-          store.addAgentChunk(message.payload.chunk)
+        if (isCurrentSession) {
+          store.setStreaming(true)
+          store.setSessionStatus('streaming')
+          store.setStreamingStatus({
+            status: message.payload.status,
+            detail: '',
+          })
+          const toolChunk = parseToolChunk(message.payload.chunk)
+          if (toolChunk?.type === 'tool_call' && toolChunk.call) {
+            store.addToolCall({ name: toolChunk.call.name, args: toolChunk.call.args })
+          } else if (toolChunk?.type === 'tool_result') {
+            store.updateActiveToolResult(toolChunk.result ?? '')
+          } else {
+            store.addAgentChunk(message.payload.chunk)
+          }
+        } else if (targetSessionId) {
+          store.setSessionStatusById(targetSessionId, 'streaming')
+          store.setStreamingStatusById(targetSessionId, {
+            status: message.payload.status,
+            detail: '',
+          })
+          store.addAgentChunkToSession(targetSessionId, message.payload.chunk)
         }
         break
       }
       case 'agent_complete': {
         const status = message.payload.status
-        store.finalizeAgentMessage(
-          status === 'success' ? 'complete' : status,
-        )
-        store.finalizeToolCalls(status === 'success' ? 'success' : 'error')
-        store.setSessionStatus(status === 'success' ? 'idle' : 'interrupted')
-        if (status === 'error' && message.payload.error_message) {
-          store.appendSystemMessage(message.payload.error_message, 'error')
+        const mappedStatus = status === 'success' ? 'complete' : status
+        if (isCurrentSession) {
+          store.finalizeAgentMessage(mappedStatus)
+          store.finalizeToolCalls(status === 'success' ? 'success' : 'error')
+          store.setSessionStatus(status === 'success' ? 'idle' : 'interrupted')
+          if (status === 'error' && message.payload.error_message) {
+            store.appendSystemMessage(message.payload.error_message, 'error')
+          }
+        } else if (targetSessionId) {
+          store.finalizeAgentMessageInSession(targetSessionId, mappedStatus)
+          store.setSessionStatusById(targetSessionId, status === 'success' ? 'idle' : 'interrupted')
+          if (status === 'error' && message.payload.error_message) {
+            store.appendSystemMessageToSession(targetSessionId, message.payload.error_message, 'error')
+          }
         }
         const liveStore = useLive2DStore.getState()
         if (status === 'success') {
@@ -138,19 +168,34 @@ function App() {
         break
       }
       case 'option_request': {
-        store.appendSystemMessage(message.payload.question, 'info')
-        store.setOptions(message.payload.options, message.payload.ui_type)
-        store.setSessionStatus('waiting_option')
+        if (isCurrentSession) {
+          store.appendSystemMessage(message.payload.question, 'info')
+          store.setOptions(message.payload.options, message.payload.ui_type)
+          store.setSessionStatus('waiting_option')
+        } else if (targetSessionId) {
+          store.appendSystemMessageToSession(targetSessionId, message.payload.question, 'info')
+          store.setOptionsForSession(targetSessionId, message.payload.options, message.payload.ui_type)
+          store.setSessionStatusById(targetSessionId, 'waiting_option')
+        }
         break
       }
       case 'status_update': {
-        store.setStreaming(true)
-        store.setStreamingStatus(message.payload)
-        store.setSessionStatus('processing')
+        if (isCurrentSession) {
+          store.setStreaming(true)
+          store.setStreamingStatus(message.payload)
+          store.setSessionStatus('processing')
+        } else if (targetSessionId) {
+          store.setStreamingStatusById(targetSessionId, message.payload)
+          store.setSessionStatusById(targetSessionId, 'processing')
+        }
         break
       }
       case 'system_notice': {
-        store.appendSystemMessage(message.payload.text, message.payload.level)
+        if (isCurrentSession) {
+          store.appendSystemMessage(message.payload.text, message.payload.level)
+        } else if (targetSessionId) {
+          store.appendSystemMessageToSession(targetSessionId, message.payload.text, message.payload.level)
+        }
         break
       }
       case 'live2d_action': {
@@ -171,13 +216,9 @@ function App() {
       }
       case 'emotion_update': {
         const { emotion, live2d_expression, live2d_motion } = message.payload
-        const targetSessionId =
-          message.session_id === 'global' ? store.currentSessionId : message.session_id
         if (targetSessionId) {
           store.setSessionCompanionEmotion(targetSessionId, emotion)
         }
-        const isCurrentSession =
-          message.session_id === 'global' || message.session_id === store.currentSessionId
         if (isCurrentSession) {
           const liveStore = useLive2DStore.getState()
           liveStore.setCurrentEmotion(emotion)
@@ -191,15 +232,17 @@ function App() {
         break
       }
       case 'companion_message': {
-        const targetSessionId =
-          message.session_id === 'global' ? store.currentSessionId : message.session_id
         if (targetSessionId) {
           store.setSessionCompanionLine(targetSessionId, message.payload.text)
         }
         break
       }
       case 'todo_update': {
-        useChatStore.getState().setTodos(message.payload.items)
+        if (isCurrentSession) {
+          store.setTodos(message.payload.items)
+        } else if (targetSessionId) {
+          store.setTodosForSession(targetSessionId, message.payload.items)
+        }
         break
       }
       case 'pong':

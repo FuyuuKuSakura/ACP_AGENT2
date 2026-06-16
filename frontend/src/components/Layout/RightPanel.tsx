@@ -1,5 +1,4 @@
 import { useSettingsStore } from '@/stores/settingsStore'
-import { useChatStore } from '@/stores/chatStore'
 import { panelWidthClasses } from '@/lib/layout'
 import Live2DViewer from '../Live2D/Live2DViewer'
 import CharacterDialogBox from '../Character/CharacterDialogBox'
@@ -7,11 +6,7 @@ import ToolPanel from '../Tools/ToolPanel'
 
 export default function RightPanel() {
   const { live2dEnabled } = useSettingsStore()
-  const currentSession = useChatStore((state) =>
-    state.sessions.find((s) => s.id === state.currentSessionId),
-  )
-
-  const personaId = currentSession?.persona_id ?? ''
+  const personaId = useSettingsStore((state) => state.globalPersonaId)
   const personaName = personaId
     ? personaId.charAt(0).toUpperCase() + personaId.slice(1)
     : '角色陪伴'

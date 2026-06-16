@@ -4,6 +4,7 @@ import { Application, settings, ENV, BatchRenderer } from 'pixi.js'
 import { Live2DModel } from 'pixi-live2d-display/cubism4'
 import { useMouseTracking } from '@/hooks/useMouseTracking'
 import { useLive2DStore } from '@/stores/live2dStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import { useChatStore } from '@/stores/chatStore'
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 
@@ -32,6 +33,7 @@ interface TouchZone {
 interface CompanionConfig {
   live2d: {
     model_path?: string
+    scale?: number
   }
   touch_zones?: {
     head?: TouchZone
@@ -69,11 +71,7 @@ export default function Live2DViewer({
   const [modelUrl, setModelUrl] = useState(DEFAULT_MODEL_URL)
   const [companionConfig, setCompanionConfig] = useState<CompanionConfig | null>(null)
 
-  const currentSessionId = useChatStore((state) => state.currentSessionId)
-  const personaId =
-    useChatStore((state) =>
-      state.sessions.find((s) => s.id === currentSessionId)?.persona_id,
-    ) ?? 'exusiai'
+  const personaId = useSettingsStore((state) => state.globalPersonaId) || 'exusiai'
 
   useEffect(() => {
     fetch(`/api/personas/${personaId}/companion`)
@@ -241,7 +239,8 @@ export default function Live2DViewer({
             app.screen.height / 1800,
           )
           // Shrink so models with large hair/ears/background stay inside the panel.
-          const scale = baseScale * 0.32
+          const scaleFactor = companionConfig?.live2d?.scale ?? 1
+          const scale = baseScale * 0.32 * scaleFactor
           model.scale.set(Math.max(0.1, scale))
           model.anchor.set(0.5, 0.5)
           model.x = app.screen.width / 2

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { User, Save, Upload, Check, FolderOpen, Plus, Unlink, RefreshCcw, Bot, X } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLive2DStore } from '@/stores/live2dStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import DionysusSelect from '@/components/UI/DionysusSelect'
 
 type SupervisorMode = 'disabled' | 'agent_session' | 'deepseek_api'
@@ -37,7 +38,9 @@ const DEFAULT_SUPERVISOR: SupervisorSettings = {
 
 export default function PersonaPage({ onCloseGuardChange, sendMessage }: PersonaPageProps) {
   const [personas, setPersonas] = useState<PersonaInfo[]>([])
-  const [selectedPersona, setSelectedPersona] = useState<string>('exusiai')
+  const globalPersonaId = useSettingsStore((state) => state.globalPersonaId)
+  const setGlobalPersonaId = useSettingsStore((state) => state.setGlobalPersonaId)
+  const [selectedPersona, setSelectedPersona] = useState<string>(globalPersonaId)
   const [corpusText, setCorpusText] = useState<string>('')
   const [loadedCorpus, setLoadedCorpus] = useState<string>('')
   const [saving, setSaving] = useState(false)
@@ -45,6 +48,8 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
   const [corpusFile, setCorpusFile] = useState<File | null>(null)
   const [live2dFiles, setLive2dFiles] = useState<File[]>([])
   const [live2dPath, setLive2dPath] = useState<string | null>(null)
+  const [live2dScale, setLive2dScale] = useState<number>(1)
+  const [loadedLive2dScale, setLoadedLive2dScale] = useState<number>(1)
   const live2dInputRef = useRef<HTMLInputElement>(null)
 
   const [supervisor, setSupervisor] = useState<SupervisorSettings>(DEFAULT_SUPERVISOR)
@@ -67,11 +72,12 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
       const data = await res.json()
       const list = Array.isArray(data) ? data : []
       setPersonas(list)
-      if (selectId) {
-        setSelectedPersona(selectId)
+      const nextId = selectId || globalPersonaId
+      if (list.some((p) => p.id === nextId)) {
+        setSelectedPersona(nextId)
       } else {
         const first = list[0]?.id || 'exusiai'
-        setSelectedPersona((prev) => (list.some((p) => p.id === prev) ? prev : first))
+        setSelectedPersona(first)
       }
     } catch {
       setPersonas([])
@@ -112,12 +118,17 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
     setCorpusText('')
     setLoadedCorpus('')
     setLive2dPath(null)
+    setLive2dScale(1)
+    setLoadedLive2dScale(1)
     fetch(`/api/personas/${selectedPersona}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.ok) {
           const companion = data.persona?.companion || {}
           setLive2dPath(companion.live2d?.model_path || null)
+          const scale = typeof companion.live2d?.scale === 'number' ? companion.live2d.scale : 1
+          setLive2dScale(scale)
+          setLoadedLive2dScale(scale)
         }
       })
       .catch(() => setLive2dPath(null))
@@ -134,7 +145,7 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
       })
   }, [selectedPersona])
 
-  const isDirty = corpusText !== loadedCorpus
+  const isDirty = corpusText !== loadedCorpus || live2dScale !== loadedLive2dScale
   const supervisorDirty = JSON.stringify(supervisor) !== JSON.stringify(loadedSupervisor)
 
   useEffect(() => {
@@ -147,6 +158,7 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
   }, [isDirty, supervisorDirty, onCloseGuardChange])
 
   const maybeSwitchPersona = (id: string) => {
+    setGlobalPersonaId(id)
     if (sendMessage && id !== currentPersonaId) {
       sendMessage({
         type: 'client_command',
@@ -161,7 +173,7 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
   }
 
   const handlePersonaChange = (id: string) => {
-    if (isDirty && !window.confirm('当前角色的语料有未保存的修改，确定要放弃吗？')) {
+    if (isDirty && !window.confirm('当前角色有未保存的修改，确定要放弃吗？')) {
       return
     }
     setSelectedPersona(id)
@@ -193,6 +205,7 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
       if (res.ok && data.id) {
         setNewPersona({ id: '', name: '', description: '' })
         setShowAddModal(false)
+        setGlobalPersonaId(data.id)
         await refreshPersonas(data.id)
         setMessage('角色添加成功')
         maybeSwitchPersona(data.id)
@@ -324,6 +337,31 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
       }
     } catch {
       setMessage('解绑失败')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const saveLive2dScale = async () => {
+    if (!selectedPersona) return
+    setSaving(true)
+    setMessage(null)
+    try {
+      const res = await fetch(`/api/personas/${selectedPersona}/live2d/scale`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scale: live2dScale }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setLoadedLive2dScale(live2dScale)
+        setMessage('缩放已保存')
+        useLive2DStore.getState().triggerModelReload()
+      } else {
+        setMessage(`缩放保存失败：${data.error || '未知错误'}`)
+      }
+    } catch {
+      setMessage('缩放保存失败')
     } finally {
       setSaving(false)
     }
@@ -523,6 +561,31 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
             请选择包含 .model3.json 入口文件的 Live2D 模型文件夹。
           </p>
         )}
+
+        <div className="mt-4 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight p-3">
+          <div className="mb-2 flex items-center justify-between text-xs text-dionysus-text-secondary">
+            <span>模型缩放</span>
+            <span>{live2dScale.toFixed(2)}x</span>
+          </div>
+          <input
+            type="range"
+            min={0.1}
+            max={3}
+            step={0.05}
+            value={live2dScale}
+            onChange={(e) => setLive2dScale(parseFloat(e.target.value))}
+            className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-dionysus-subtle-border accent-dionysus-primary"
+          />
+          <button
+            type="button"
+            onClick={saveLive2dScale}
+            disabled={saving || live2dScale === loadedLive2dScale}
+            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+          >
+            <Save className="h-3.5 w-3.5" />
+            保存缩放
+          </button>
+        </div>
       </section>
 
       <section>

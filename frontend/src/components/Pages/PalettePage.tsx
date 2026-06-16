@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Palette, Type, Image, Upload, RotateCcw } from 'lucide-react'
 import { useSettingsStore, type FontSize } from '@/stores/settingsStore'
 import { useThemeStore } from '@/stores/themeStore'
@@ -28,6 +28,19 @@ export default function PalettePage() {
   const { setTrackingEnabled } = useLive2DStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [wallpaperInput, setWallpaperInput] = useState(wallpaperUrl)
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const debouncedSaveConfig = useCallback(
+    (patch: { opacity?: number; blur?: number; brightness?: number }) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+      debounceTimerRef.current = setTimeout(() => {
+        saveWallpaperConfig(patch)
+      }, 300)
+    },
+    [wallpaperUrl, wallpaperOpacity, wallpaperBlur, wallpaperBrightness],
+  )
 
   useEffect(() => {
     loadAllThemes().then(setAvailableThemes).catch(() => {
@@ -44,24 +57,67 @@ export default function PalettePage() {
     setTrackingEnabled(enabled)
   }
 
-  const handleWallpaperFile = async (file: File | null) => {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const result = reader.result
-      if (typeof result === 'string') {
-        setWallpaperUrl(result)
-      }
+  const saveWallpaperConfig = async (patch: {
+    url?: string
+    opacity?: number
+    blur?: number
+    brightness?: number
+  }) => {
+    try {
+      await fetch('/api/wallpaper/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: patch.url ?? wallpaperUrl,
+          opacity: patch.opacity ?? wallpaperOpacity,
+          blur: patch.blur ?? wallpaperBlur,
+          brightness: patch.brightness ?? wallpaperBrightness,
+        }),
+      })
+    } catch {
+      // Best-effort persistence.
     }
-    reader.readAsDataURL(file)
   }
 
-  const applyWallpaperUrl = () => {
+  const handleWallpaperFile = async (file: File | null) => {
+    if (!file) return
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      const res = await fetch('/api/wallpaper', {
+        method: 'POST',
+        body: form,
+      })
+      const data = await res.json()
+      if (res.ok && data.url) {
+        setWallpaperUrl(data.url)
+        await saveWallpaperConfig({ url: data.url })
+      }
+    } catch {
+      // Fallback to base64 data URL if backend upload fails.
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result
+        if (typeof result === 'string') {
+          setWallpaperUrl(result)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const applyWallpaperUrl = async () => {
     const url = wallpaperInput.trim()
     setWallpaperUrl(url)
+    await saveWallpaperConfig({ url })
   }
 
   const handleReset = async () => {
+    try {
+      await fetch('/api/wallpaper', { method: 'DELETE' })
+    } catch {
+      // ignore
+    }
     resetWallpaper()
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -183,7 +239,10 @@ export default function PalettePage() {
             min={0}
             max={1}
             step={0.01}
-            onChange={setWallpaperOpacity}
+            onChange={(value) => {
+              setWallpaperOpacity(value)
+              debouncedSaveConfig({ opacity: value })
+            }}
           />
           <Slider
             label="模糊度"
@@ -191,7 +250,10 @@ export default function PalettePage() {
             min={0}
             max={32}
             step={1}
-            onChange={setWallpaperBlur}
+            onChange={(value) => {
+              setWallpaperBlur(value)
+              debouncedSaveConfig({ blur: value })
+            }}
           />
           <Slider
             label="亮度"
@@ -199,7 +261,10 @@ export default function PalettePage() {
             min={0.1}
             max={2}
             step={0.05}
-            onChange={setWallpaperBrightness}
+            onChange={(value) => {
+              setWallpaperBrightness(value)
+              debouncedSaveConfig({ brightness: value })
+            }}
           />
         </div>
 

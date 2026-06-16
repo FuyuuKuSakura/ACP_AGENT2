@@ -38,6 +38,7 @@ interface ChatState {
   companionHistory: string[]
   sessionCompanion: Record<string, { line: string | null; emotion: string | null; history: string[] }>
   todos: TodoItem[]
+  sessionTodos: Record<string, TodoItem[]>
 
   addSession: (session?: Partial<Session>) => Session
   setCurrentSession: (sessionId: string) => void
@@ -46,18 +47,25 @@ interface ChatState {
   updateSession: (sessionId: string, patch: Partial<Session>) => void
   addUserMessage: (text: string, attachments?: unknown[]) => ChatMessage
   addAgentChunk: (chunk: string) => void
+  addAgentChunkToSession: (sessionId: string, chunk: string) => void
   finalizeAgentMessage: (status?: 'complete' | 'interrupted' | 'error') => void
+  finalizeAgentMessageInSession: (sessionId: string, status?: 'complete' | 'interrupted' | 'error') => void
   setOptions: (options: OptionItem[], uiType?: OptionsUiType) => void
+  setOptionsForSession: (sessionId: string, options: OptionItem[], uiType?: OptionsUiType) => void
   selectOption: (option: OptionItem) => void
   clearOptions: () => void
   setStreaming: (isStreaming: boolean) => void
   setStreamingStatus: (status: StatusUpdateMessage['payload'] | null) => void
+  setStreamingStatusById: (sessionId: string, status: StatusUpdateMessage['payload'] | null) => void
   setSessionStatus: (status: SessionStatus) => void
+  setSessionStatusById: (sessionId: string, status: SessionStatus) => void
   setCompanionLine: (line: string | null) => void
   setSessionCompanionLine: (sessionId: string, line: string | null) => void
   setSessionCompanionEmotion: (sessionId: string, emotion: string | null) => void
   setTodos: (items: TodoItem[]) => void
+  setTodosForSession: (sessionId: string, items: TodoItem[]) => void
   appendSystemMessage: (text: string, level?: 'info' | 'warning' | 'error') => void
+  appendSystemMessageToSession: (sessionId: string, text: string, level?: 'info' | 'warning' | 'error') => void
   loadSessionMessages: (sessionId: string, messages: ChatMessage[]) => void
   addToolCall: (tool: Pick<ToolCall, 'name' | 'args'>) => ToolCall
   updateActiveToolResult: (result: string, status?: 'success' | 'error') => void
@@ -82,6 +90,7 @@ export const useChatStore = create<ChatState>()(
       companionHistory: [],
       sessionCompanion: {},
       todos: [],
+      sessionTodos: {},
 
       addSession: (session) => {
     const now = Date.now()
@@ -117,18 +126,24 @@ export const useChatStore = create<ChatState>()(
   setCurrentSession: (sessionId) => {
     const session = get().sessions.find((s) => s.id === sessionId)
     const companion = get().sessionCompanion[sessionId]
+    const sessionTodos = get().sessionTodos[sessionId] ?? []
+    // Restore streaming state if the session still has a streaming agent message.
+    const hasStreamingAgent = session?.messages.some(
+      (m) => m.role === 'agent' && m.status === 'streaming',
+    )
     set({
       currentSessionId: sessionId,
       messages: session?.messages ?? [],
       currentOptions: null,
       currentOptionsUiType: null,
       optionDisabled: false,
-      isStreaming: false,
-      streamingStatus: null,
+      isStreaming: hasStreamingAgent ?? false,
+      streamingStatus: hasStreamingAgent ? { status: 'outputting', detail: '' } : null,
       toolCalls: [],
       activeToolCallId: null,
       companionLine: companion?.line ?? null,
       companionHistory: companion?.history ?? [],
+      todos: sessionTodos,
     })
   },
 
@@ -269,6 +284,44 @@ export const useChatStore = create<ChatState>()(
     })
   },
 
+  addAgentChunkToSession: (sessionId, chunk) => {
+    if (!sessionId) return
+    set((state) => {
+      const session = state.sessions.find((s) => s.id === sessionId)
+      if (!session) return state
+
+      const msgs = session.messages
+      const lastMessage = msgs[msgs.length - 1]
+      let nextMessages: ChatMessage[]
+      if (lastMessage && lastMessage.role === 'agent' && lastMessage.status === 'streaming') {
+        nextMessages = msgs.map((m, idx) =>
+          idx === msgs.length - 1 ? { ...m, content: m.content + chunk } : m,
+        )
+      } else {
+        const newMessage: ChatMessage = {
+          id: generateId(),
+          role: 'agent',
+          content: chunk,
+          timestamp: Date.now(),
+          trace_id: generateId(),
+          status: 'streaming',
+        }
+        nextMessages = [...msgs, newMessage]
+      }
+
+      const sessions = state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, updated_at: Date.now(), messages: nextMessages } : s,
+      )
+
+      // Only update the displayed messages if this is the active session.
+      const messages =
+        state.currentSessionId === sessionId
+          ? nextMessages
+          : state.messages
+      return { sessions, messages }
+    })
+  },
+
   finalizeAgentMessage: (status = 'complete') => {
     const sessionId = get().currentSessionId
     if (!sessionId) return
@@ -301,11 +354,71 @@ export const useChatStore = create<ChatState>()(
     })
   },
 
+  finalizeAgentMessageInSession: (sessionId, status = 'complete') => {
+    if (!sessionId) return
+    set((state) => {
+      const session = state.sessions.find((s) => s.id === sessionId)
+      if (!session) return state
+
+      const nextMessages = session.messages.map((m, idx) =>
+        idx === session.messages.length - 1 && m.role === 'agent' && m.status === 'streaming'
+          ? { ...m, status }
+          : m,
+      )
+      const finalToolStatus: Extract<ToolCall['status'], 'success' | 'error'> =
+        status === 'complete' ? 'success' : 'error'
+
+      const sessions = state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, updated_at: Date.now(), messages: nextMessages } : s,
+      )
+      const isCurrent = state.currentSessionId === sessionId
+      return {
+        sessions,
+        messages: isCurrent ? nextMessages : state.messages,
+        isStreaming: isCurrent ? false : state.isStreaming,
+        streamingStatus: isCurrent ? null : state.streamingStatus,
+        toolCalls: isCurrent
+          ? state.toolCalls.map((t) =>
+              t.status === 'running' ? { ...t, status: finalToolStatus } : t,
+            )
+          : state.toolCalls,
+        activeToolCallId: isCurrent ? null : state.activeToolCallId,
+      }
+    })
+  },
+
   setOptions: (options, uiType) => {
     set({
       currentOptions: options,
       currentOptionsUiType: uiType ?? 'button_group',
       optionDisabled: false,
+    })
+  },
+
+  setOptionsForSession: (sessionId, options, uiType) => {
+    if (!sessionId) return
+    set((state) => {
+      const isCurrent = state.currentSessionId === sessionId
+      // Persist options inside the session's last message so they survive tab switches.
+      const sessions = state.sessions.map((s) => {
+        if (s.id !== sessionId) return s
+        const msgs = s.messages
+        const lastMsg = msgs[msgs.length - 1]
+        if (lastMsg && lastMsg.role === 'agent' && lastMsg.status === 'streaming') {
+          const nextMsgs = msgs.map((m, idx) =>
+            idx === msgs.length - 1 ? { ...m, options } : m,
+          )
+          return { ...s, messages: nextMsgs }
+        }
+        return s
+      })
+      return {
+        sessions,
+        messages: isCurrent ? sessions.find((s) => s.id === sessionId)?.messages ?? state.messages : state.messages,
+        currentOptions: isCurrent ? options : state.currentOptions,
+        currentOptionsUiType: isCurrent ? uiType ?? 'button_group' : state.currentOptionsUiType,
+        optionDisabled: isCurrent ? false : state.optionDisabled,
+      }
     })
   },
 
@@ -350,6 +463,16 @@ export const useChatStore = create<ChatState>()(
 
   setStreamingStatus: (streamingStatus) => {
     set({ streamingStatus })
+  },
+
+  setStreamingStatusById: (sessionId, streamingStatus) => {
+    if (!sessionId) return
+    set((state) => {
+      const isCurrent = state.currentSessionId === sessionId
+      return {
+        streamingStatus: isCurrent ? streamingStatus : state.streamingStatus,
+      }
+    })
   },
 
   setCompanionLine: (companionLine) => {
@@ -414,8 +537,29 @@ export const useChatStore = create<ChatState>()(
 
   setTodos: (todos) => set({ todos }),
 
+  setTodosForSession: (sessionId, items) => {
+    if (!sessionId) return
+    set((state) => {
+      const nextSessionTodos = { ...state.sessionTodos, [sessionId]: items }
+      const isCurrent = state.currentSessionId === sessionId
+      return {
+        sessionTodos: nextSessionTodos,
+        todos: isCurrent ? items : state.todos,
+      }
+    })
+  },
+
   setSessionStatus: (status) => {
     const sessionId = get().currentSessionId
+    if (!sessionId) return
+    set((state) => ({
+      sessions: state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, status } : s,
+      ),
+    }))
+  },
+
+  setSessionStatusById: (sessionId, status) => {
     if (!sessionId) return
     set((state) => ({
       sessions: state.sessions.map((s) =>
@@ -442,6 +586,32 @@ export const useChatStore = create<ChatState>()(
         s.id === sessionId ? { ...s, updated_at: now, messages } : s,
       )
       return { sessions, messages }
+    })
+  },
+
+  appendSystemMessageToSession: (sessionId, text, level = 'info') => {
+    if (!sessionId) return
+    const now = Date.now()
+    const message: ChatMessage = {
+      id: generateId(),
+      role: 'system',
+      content: text,
+      timestamp: now,
+      trace_id: generateId(),
+      metadata: { level },
+    }
+    set((state) => {
+      const session = state.sessions.find((s) => s.id === sessionId)
+      if (!session) return state
+      const nextMessages = [...session.messages, message]
+      const sessions = state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, updated_at: now, messages: nextMessages } : s,
+      )
+      const isCurrent = state.currentSessionId === sessionId
+      return {
+        sessions,
+        messages: isCurrent ? nextMessages : state.messages,
+      }
     })
   },
 

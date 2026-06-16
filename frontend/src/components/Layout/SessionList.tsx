@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Pencil } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLayoutStore } from '@/stores/layoutStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import MobileSessionListHeader from './MobileSessionListHeader'
 import type { Session } from '@/types/protocol'
 
@@ -36,8 +37,10 @@ export default function SessionList({ sendMessage }: SessionListProps) {
   const [editingTitle, setEditingTitle] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
 
+  const globalPersonaId = useSettingsStore((state) => state.globalPersonaId)
+
   const handleNewSession = () => {
-    sendMessage?.({ type: 'new_session', payload: { persona_id: 'exusiai' } })
+    sendMessage?.({ type: 'new_session', payload: { persona_id: globalPersonaId } })
   }
 
   const handleSelect = (id: string) => {

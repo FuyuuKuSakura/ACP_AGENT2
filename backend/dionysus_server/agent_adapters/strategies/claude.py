@@ -43,8 +43,8 @@ class ClaudeStrategy(JSONStreamStrategy):
             args.extend(["--continue", "--session-id", session_id])
 
         model = config.get("model")
-        if model:
-            args.extend(["--model", model])
+        if isinstance(model, str) and model.strip():
+            args.extend(["--model", model.strip()])
 
         # Non-interactive automation: always bypass permission prompts.
         args.append("--dangerously-skip-permissions")

@@ -13,6 +13,7 @@ interface SettingsState {
   wallpaperBlur: number
   wallpaperBrightness: number
   historyLimit: number
+  globalPersonaId: string
 
   setFontSize: (value: FontSize) => void
   setLive2dEnabled: (value: boolean) => void
@@ -24,6 +25,8 @@ interface SettingsState {
   setWallpaperBrightness: (value: number) => void
   setHistoryLimit: (value: number) => void
   resetWallpaper: () => void
+  setGlobalPersonaId: (value: string) => void
+  initWallpaperFromServer: () => Promise<void>
 }
 
 const DEFAULT_WALLPAPER_OPACITY = 0.15
@@ -43,6 +46,7 @@ export const useSettingsStore = create<SettingsState>()(
       wallpaperBlur: DEFAULT_WALLPAPER_BLUR,
       wallpaperBrightness: DEFAULT_WALLPAPER_BRIGHTNESS,
       historyLimit: DEFAULT_HISTORY_LIMIT,
+      globalPersonaId: 'exusiai',
       setFontSize: (value) => set({ fontSize: value }),
       setLive2dEnabled: (value) => set({ live2dEnabled: value }),
       setTtsEnabled: (value) => set({ ttsEnabled: value }),
@@ -59,6 +63,32 @@ export const useSettingsStore = create<SettingsState>()(
           wallpaperBlur: DEFAULT_WALLPAPER_BLUR,
           wallpaperBrightness: DEFAULT_WALLPAPER_BRIGHTNESS,
         }),
+      setGlobalPersonaId: (value) => set({ globalPersonaId: value }),
+      initWallpaperFromServer: async () => {
+        try {
+          const res = await fetch('/api/wallpaper')
+          if (!res.ok) return
+          const data = (await res.json()) as {
+            url?: string
+            opacity?: number
+            blur?: number
+            brightness?: number
+          }
+          set({
+            wallpaperUrl: data.url ?? '',
+            wallpaperOpacity:
+              typeof data.opacity === 'number' ? data.opacity : DEFAULT_WALLPAPER_OPACITY,
+            wallpaperBlur:
+              typeof data.blur === 'number' ? data.blur : DEFAULT_WALLPAPER_BLUR,
+            wallpaperBrightness:
+              typeof data.brightness === 'number'
+                ? data.brightness
+                : DEFAULT_WALLPAPER_BRIGHTNESS,
+          })
+        } catch {
+          // Keep persisted local values on failure.
+        }
+      },
     }),
     {
       name: 'dionysus-settings',
