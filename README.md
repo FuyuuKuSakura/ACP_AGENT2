@@ -10,7 +10,7 @@ Dionysus（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的 Codi
 
 > **当前 Release 仅限 macOS**（Apple Silicon + Intel）。Windows / Linux 版本后续计划支持。
 
-1. 访问 [Releases](https://github.com/FuyuuKuSakura/ACP_AGENT2/releases) 页面。
+1. 访问 [Releases](https://github.com/FuyuuKuSakura/DionysusC/releases) 页面。
 2. 下载 `Dionysus-0.2.0-arm64.dmg`（M 系列芯片）或 `Dionysus-0.2.0.dmg`（Intel 芯片）。
 3. 打开 DMG，将 `Dionysus.app` 拖入 `Applications`。
 4. 首次启动时，由于应用**未进行 Apple 代码签名**，系统会提示“无法打开”。
