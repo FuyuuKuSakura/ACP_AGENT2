@@ -1,0 +1,78 @@
+
+[2026-06-16T17:59:38] Testing kimi_cli ...
+{
+  "adapter": "kimi_cli",
+  "session_id": "eba77067-8a93-4e38-8f08-f8c02b17660b",
+  "connected": true,
+  "switched": true,
+  "status_flow": [
+    "outputting"
+  ],
+  "chunks": [
+    "🔧 调用工具: Write(path='hello_kimi_cli.txt', content='hello from kimi_cli')\n",
+    "🛠️ 工具结果: Wrote 19 bytes to hello_kimi_cli.txt\n",
+    "已完成！已在当前工作目录创建 `hello_kimi_cli.txt`，内容为 `hello from kimi_cli`。"
+  ],
+  "complete": {
+    "status": "success",
+    "duration_ms": null,
+    "artifacts": [],
+    "error_message": null
+  },
+  "error": null,
+  "file_created": true,
+  "duration_ms": 6825
+}
+
+[2026-06-16T17:59:45] Testing codex_cli ...
+{
+  "adapter": "codex_cli",
+  "session_id": "677eda2a-c92c-4ccd-8a95-7b8c9e80e3bf",
+  "connected": true,
+  "switched": true,
+  "status_flow": [],
+  "chunks": [
+    "Reading additional input from stdin...\n"
+  ],
+  "complete": null,
+  "error": "timeout waiting for agent_complete",
+  "file_created": false,
+  "duration_ms": 300218
+}
+
+[2026-06-16T18:04:45] Testing claude_cli ...
+{
+  "adapter": "claude_cli",
+  "session_id": "60291458-3c11-4fb7-9b25-31c834c017a0",
+  "connected": true,
+  "switched": true,
+  "status_flow": [],
+  "chunks": [
+    "Error: --session-id can only be used with --continue or --resume if --fork-session is also specified.\n"
+  ],
+  "complete": {
+    "status": "error",
+    "duration_ms": null,
+    "artifacts": [],
+    "error_message": "claude_cli exited with code 1"
+  },
+  "error": null,
+  "file_created": false,
+  "duration_ms": 437
+}
+
+[2026-06-16T18:04:46] Testing opencode_cli ...
+{
+  "adapter": "opencode_cli",
+  "session_id": "803608ed-fd97-4a0a-899c-83b27bb6f9ba",
+  "connected": true,
+  "switched": true,
+  "status_flow": [],
+  "chunks": [],
+  "complete": null,
+  "error": "timeout waiting for agent_complete",
+  "file_created": false,
+  "duration_ms": 300169
+}
+
+Report saved to /Users/fuyuuku/ACP_AGENT2/qa_reports/adapter_test_report.json

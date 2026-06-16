@@ -1,0 +1,108 @@
+
+[2026-06-16T18:14:34] Testing kimi_cli ...
+{
+  "adapter": "kimi_cli",
+  "session_id": "546c0178-9585-46d1-8d89-a0054ab4ab64",
+  "connected": true,
+  "switched": true,
+  "status_flow": [
+    "outputting"
+  ],
+  "chunks": [
+    "🔧 调用工具: Write(path='hello_kimi_cli.txt', content='hello from kimi_cli')\n",
+    "🛠️ 工具结果: Wrote 19 bytes to hello_kimi_cli.txt\n",
+    "已完成，已在当前工作目录创建 `hello_kimi_cli.txt`，内容为 `hello from kimi_cli`。"
+  ],
+  "complete": {
+    "status": "success",
+    "duration_ms": null,
+    "artifacts": [],
+    "error_message": null
+  },
+  "error": null,
+  "file_created": true,
+  "duration_ms": 5347
+}
+
+[2026-06-16T18:14:39] Testing codex_cli ...
+{
+  "adapter": "codex_cli",
+  "session_id": "2bf5bdc4-2d6a-4fd2-8fb6-0bcdcc1675c2",
+  "connected": true,
+  "switched": true,
+  "status_flow": [],
+  "chunks": [
+    "Reading additional input from stdin...\n",
+    "{\"type\": \"thread.started\", \"thread_id\": \"019ecfed-0dce-74c1-aaa2-9e60a9b68329\"}\n",
+    "{\"type\": \"turn.started\"}\n",
+    "{\"type\": \"item.completed\", \"item\": {\"id\": \"item_0\", \"type\": \"reasoning\", \"text\": \"The user wants me to create a file named `hello_codex_cli.txt` in the current working directory with the content `hello from codex_cli`.\"}}\n",
+    "{\"type\": \"item.started\", \"item\": {\"id\": \"item_1\", \"type\": \"command_execution\", \"command\": \"/bin/zsh -lc \\\"echo 'hello from codex_cli' > /Users/fuyuuku/ACP_AGENT2/test_workspace/hello_codex_cli.txt\\\"\", \"aggregated_output\": \"\", \"exit_code\": null, \"status\": \"in_progress\"}}\n",
+    "{\"type\": \"item.completed\", \"item\": {\"id\": \"item_1\", \"type\": \"command_execution\", \"command\": \"/bin/zsh -lc \\\"echo 'hello from codex_cli' > /Users/fuyuuku/ACP_AGENT2/test_workspace/hello_codex_cli.txt\\\"\", \"aggregated_output\": \"\", \"exit_code\": 0, \"status\": \"completed\"}}\n",
+    "{\"type\": \"item.completed\", \"item\": {\"id\": \"item_2\", \"type\": \"reasoning\", \"text\": \"File created successfully. Let me verify.\"}}\n",
+    "{\"type\": \"item.started\", \"item\": {\"id\": \"item_3\", \"type\": \"command_execution\", \"command\": \"/bin/zsh -lc 'cat /Users/fuyuuku/ACP_AGENT2/test_workspace/hello_codex_cli.txt'\", \"aggregated_output\": \"\", \"exit_code\": null, \"status\": \"in_progress\"}}\n",
+    "{\"type\": \"item.completed\", \"item\": {\"id\": \"item_3\", \"type\": \"command_execution\", \"command\": \"/bin/zsh -lc 'cat /Users/fuyuuku/ACP_AGENT2/test_workspace/hello_codex_cli.txt'\", \"aggregated_output\": \"hello from codex_cli\\n\", \"exit_code\": 0, \"status\": \"completed\"}}\n",
+    "{\"type\": \"item.completed\", \"item\": {\"id\": \"item_4\", \"type\": \"reasoning\", \"text\": \"The file has been created and verified. Done.\"}}\n",
+    "{\"type\": \"item.completed\", \"item\": {\"id\": \"item_5\", \"type\": \"agent_message\", \"text\": \"已完成。`hello_codex_cli.txt` 已创建于当前工作目录，内容为 `hello from codex_cli`。\"}}\n",
+    "{\"type\": \"turn.completed\", \"usage\": {\"input_tokens\": 25903, \"cached_input_tokens\": 25472, \"output_tokens\": 224, \"reasoning_output_tokens\": 51}}\n"
+  ],
+  "complete": {
+    "status": "success",
+    "duration_ms": null,
+    "artifacts": [],
+    "error_message": null
+  },
+  "error": null,
+  "file_created": true,
+  "duration_ms": 14053
+}
+
+[2026-06-16T18:14:53] Testing claude_cli ...
+{
+  "adapter": "claude_cli",
+  "session_id": "67b08001-b8c9-42d4-aeb3-79b966bff0f9",
+  "connected": true,
+  "switched": true,
+  "status_flow": [],
+  "chunks": [
+    "命令正在等待您的审批，请确认即可创建文件。\n"
+  ],
+  "complete": {
+    "status": "success",
+    "duration_ms": null,
+    "artifacts": [],
+    "error_message": null
+  },
+  "error": null,
+  "file_created": false,
+  "duration_ms": 16673
+}
+
+[2026-06-16T18:15:10] Testing opencode_cli ...
+{
+  "adapter": "opencode_cli",
+  "session_id": "77c34b38-604f-45ef-bafe-1bbbce22f28a",
+  "connected": true,
+  "switched": true,
+  "status_flow": [
+    "outputting"
+  ],
+  "chunks": [
+    "{\"type\": \"step_start\", \"timestamp\": 1781604912920, \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"part\": {\"id\": \"prt_ecfed8f16001hIWhh8AAE0mFUD\", \"messageID\": \"msg_ecfed8d36001KNYM66uR8K7MYy\", \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"type\": \"step-start\"}}\n",
+    "{\"type\": \"tool_use\", \"timestamp\": 1781604914954, \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"part\": {\"type\": \"tool\", \"tool\": \"bash\", \"callID\": \"call_00_MGYGBdScoLJutKOaonWW4230\", \"state\": {\"status\": \"completed\", \"input\": {\"command\": \"python3 -c \\\"open('hello_opencode_cli.txt', 'w').write('hello from opencode_cli')\\\"\", \"description\": \"Create file with python one-liner\"}, \"output\": \"(no output)\", \"metadata\": {\"output\": \"(no output)\", \"exit\": 0, \"description\": \"Create file with python one-liner\", \"truncated\": false}, \"title\": \"Create file with python one-liner\", \"time\": {\"start\": 1781604914895, \"end\": 1781604914951}}, \"id\": \"prt_ecfed9557001JYgMBGgqB6R3uY\", \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"messageID\": \"msg_ecfed8d36001KNYM66uR8K7MYy\"}}\n",
+    "{\"type\": \"step_finish\", \"timestamp\": 1781604915032, \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"part\": {\"id\": \"prt_ecfed97550011keRXTNDliq5S1\", \"reason\": \"tool-calls\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"messageID\": \"msg_ecfed8d36001KNYM66uR8K7MYy\", \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"type\": \"step-finish\", \"tokens\": {\"total\": 7614, \"input\": 26, \"output\": 91, \"reasoning\": 73, \"cache\": {\"write\": 0, \"read\": 7424}}, \"cost\": 7.03472e-05}}\n",
+    "{\"type\": \"step_start\", \"timestamp\": 1781604915373, \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"part\": {\"id\": \"prt_ecfed98ac001ieOxmcdQnKwMJT\", \"messageID\": \"msg_ecfed978c001At5iWmWm5gEVPG\", \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"type\": \"step-start\"}}\n",
+    "已完成。文件 `hello_opencode_cli.txt` 已创建，内容为 `hello from opencode_cli`。",
+    "{\"type\": \"step_finish\", \"timestamp\": 1781604916044, \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"part\": {\"id\": \"prt_ecfed9b4900102mwmNrGiqocSV\", \"reason\": \"stop\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"messageID\": \"msg_ecfed978c001At5iWmWm5gEVPG\", \"sessionID\": \"ses_13012777fffe0TzIE01195U4c7\", \"type\": \"step-finish\", \"tokens\": {\"total\": 7666, \"input\": 76, \"output\": 27, \"reasoning\": 11, \"cache\": {\"write\": 0, \"read\": 7552}}, \"cost\": 4.24256e-05}}\n"
+  ],
+  "complete": {
+    "status": "success",
+    "duration_ms": null,
+    "artifacts": [],
+    "error_message": null
+  },
+  "error": null,
+  "file_created": false,
+  "duration_ms": 5774
+}
+
+Report saved to /Users/fuyuuku/ACP_AGENT2/qa_reports/adapter_test_report.json

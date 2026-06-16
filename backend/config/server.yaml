@@ -35,7 +35,7 @@ agent_adapter:
       restart_on_crash: true
       max_restart_attempts: 3
       request_timeout_seconds: 600
-      enabled: false
+      enabled: true
     codex_cli:
       type: "codex_cli"
       strategy: "codex"
@@ -44,7 +44,7 @@ agent_adapter:
       restart_on_crash: true
       max_restart_attempts: 3
       request_timeout_seconds: 600
-      enabled: false
+      enabled: true
     opencode_cli:
       type: "opencode_cli"
       strategy: "opencode"

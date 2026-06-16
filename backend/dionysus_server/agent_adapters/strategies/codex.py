@@ -98,6 +98,36 @@ class CodexStrategy(JSONStreamStrategy):
             )
             return events
 
+        # Codex "item.completed" wraps command_execution, reasoning and agent_message.
+        if msg_type == "item.completed":
+            item = parsed.get("item", {})
+            item_type = item.get("type")
+            if item_type == "agent_message":
+                content = item.get("text", "")
+                if content:
+                    events.append(
+                        AgentEvent(
+                            type="agent_stream",
+                            payload={"chunk": str(content), "is_final": False, "status": "outputting"},
+                        )
+                    )
+            elif item_type == "command_execution":
+                command = item.get("command", "")
+                output = item.get("aggregated_output", "")
+                exit_code = item.get("exit_code")
+                chunk = f"🔧 Codex command: {command}\n"
+                if output:
+                    chunk += f"🛠️ output: {output}\n"
+                if exit_code is not None:
+                    chunk += f"exit code: {exit_code}\n"
+                events.append(
+                    AgentEvent(
+                        type="agent_stream",
+                        payload={"chunk": chunk, "is_final": False, "status": "outputting"},
+                    )
+                )
+            return events
+
         # The final result envelope may have a top-level result string.
         if "result" in parsed and isinstance(parsed["result"], str):
             events.append(

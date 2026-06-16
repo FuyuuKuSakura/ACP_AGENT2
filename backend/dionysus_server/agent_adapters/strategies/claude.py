@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import uuid
 from typing import Any
 
 from dionysus_server.models import AgentEvent, StatusEnum
@@ -30,38 +29,25 @@ class ClaudeStrategy(JSONStreamStrategy):
         mode: str,
         config: dict[str, Any],
     ) -> list[str]:
-        output_format = config.get("output_format", "stream-json")
-        # Claude uses --session-id on first turn and -r to resume.
-        if session_id is None:
-            session_id = str(uuid.uuid4())
-
         if mode in ("plan", "plan_yolo"):
             text = (
                 "Please enter plan mode: list clear execution steps first, "
                 "then wait for confirmation before implementing.\n\n" + text
             )
 
-        args = [
-            "-p",
-            text,
-            "--output-format",
-            output_format,
-            "--session-id",
-            session_id,
-        ]
-        # On subsequent turns resume the existing session.
+        args = ["-p", text]
+
+        # Resume an existing session; for a brand-new session Claude will create
+        # its own session id and we capture it from the verbose output.
         if session_id:
-            args.extend(["-r", session_id])
+            args.extend(["--continue", "--session-id", session_id])
 
         model = config.get("model")
         if model:
             args.extend(["--model", model])
 
-        if output_format == "stream-json":
-            args.extend(["--verbose", "--include-partial-messages"])
-
-        if mode in ("yolo", "plan_yolo"):
-            args.append("--dangerously-skip-permissions")
+        # Non-interactive automation: always bypass permission prompts.
+        args.append("--dangerously-skip-permissions")
 
         return args
 

@@ -79,6 +79,11 @@ class GenericCLIAdapter(IAgentAdapter):
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.STDOUT,
             )
+            # Most agent CLIs detect an open stdin pipe and wait for additional
+            # input. We pass the prompt as CLI arguments, so close stdin early.
+            if self._process.stdin is not None:
+                self._process.stdin.close()
+                await self._process.stdin.wait_closed()
         except FileNotFoundError as exc:
             self._logger.error("command_not_found", command=self._command, error=str(exc))
             yield AgentEvent(

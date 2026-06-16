@@ -42,6 +42,10 @@ class OpenCodeStrategy(JSONStreamStrategy):
         if model:
             args.extend(["--model", model])
 
+        working_dir = config.get("working_dir")
+        if working_dir:
+            args.extend(["--dir", working_dir])
+
         if session_id:
             args.extend(["--session", session_id])
 
@@ -52,7 +56,7 @@ class OpenCodeStrategy(JSONStreamStrategy):
         return args
 
     def extract_session_id(self, parsed: dict[str, Any]) -> str | None:
-        return parsed.get("session_id") or parsed.get("session")
+        return parsed.get("session_id") or parsed.get("session") or parsed.get("sessionID")
 
     def _normalize_object(self, parsed: dict[str, Any]) -> list[AgentEvent]:
         events: list[AgentEvent] = []
@@ -60,6 +64,25 @@ class OpenCodeStrategy(JSONStreamStrategy):
 
         if msg_type in ("message", "agent_message", "output"):
             content = parsed.get("content") or parsed.get("text") or parsed.get("message", "")
+            if content:
+                events.append(
+                    AgentEvent(
+                        type="status_update",
+                        payload={"status": StatusEnum.OUTPUTTING, "detail": "OpenCode 正在输出..."},
+                    )
+                )
+                events.append(
+                    AgentEvent(
+                        type="agent_stream",
+                        payload={"chunk": str(content), "is_final": False, "status": "outputting"},
+                    )
+                )
+            return events
+
+        # opencode run --format json emits "text" events with a nested part.text.
+        if msg_type == "text":
+            part = parsed.get("part") or {}
+            content = part.get("text") or parsed.get("text", "")
             if content:
                 events.append(
                     AgentEvent(

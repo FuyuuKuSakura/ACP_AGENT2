@@ -1,0 +1,99 @@
+{
+  "tested_at": "2026-06-16T18:17:55",
+  "base_url": "ws://127.0.0.1:8765/ws",
+  "results": [
+    {
+      "adapter": "kimi_cli",
+      "session_id": "a0d2303e-720d-4e8b-843e-006f9f14811a",
+      "connected": true,
+      "switched": true,
+      "status_flow": [
+        "outputting"
+      ],
+      "chunks": [
+        "🔧 调用工具: Write(path='hello_kimi_cli.txt', content='hello from kimi_cli')\n",
+        "🛠️ 工具结果: Wrote 19 bytes to hello_kimi_cli.txt\n",
+        "已完成！文件 `hello_kimi_cli.txt` 已创建在当前工作目录，内容为 `hello from kimi_cli`。"
+      ],
+      "complete": {
+        "status": "success",
+        "duration_ms": null,
+        "artifacts": [],
+        "error_message": null
+      },
+      "error": null,
+      "file_created": true,
+      "duration_ms": 9618
+    },
+    {
+      "adapter": "codex_cli",
+      "session_id": "5c8084c5-940e-4636-af71-455207bd4faf",
+      "connected": true,
+      "switched": true,
+      "status_flow": [],
+      "chunks": [
+        "Reading additional input from stdin...\n",
+        "{\"type\": \"thread.started\", \"thread_id\": \"019ecfef-a99f-7e43-b941-2835a00a6715\"}\n",
+        "{\"type\": \"turn.started\"}\n",
+        "{\"type\": \"item.started\", \"item\": {\"id\": \"item_1\", \"type\": \"command_execution\", \"command\": \"/bin/zsh -lc \\\"echo 'hello from codex_cli' > /Users/fuyuuku/ACP_AGENT2/test_workspace/hello_codex_cli.txt\\\"\", \"aggregated_output\": \"\", \"exit_code\": null, \"status\": \"in_progress\"}}\n",
+        "🔧 Codex command: /bin/zsh -lc \"echo 'hello from codex_cli' > /Users/fuyuuku/ACP_AGENT2/test_workspace/hello_codex_cli.txt\"\nexit code: 0\n",
+        "文件已创建在 `/Users/fuyuuku/ACP_AGENT2/test_workspace/hello_codex_cli.txt`，内容为 `hello from codex_cli`。",
+        "{\"type\": \"turn.completed\", \"usage\": {\"input_tokens\": 17126, \"cached_input_tokens\": 17024, \"output_tokens\": 158, \"reasoning_output_tokens\": 41}}\n"
+      ],
+      "complete": {
+        "status": "success",
+        "duration_ms": null,
+        "artifacts": [],
+        "error_message": null
+      },
+      "error": null,
+      "file_created": true,
+      "duration_ms": 10421
+    },
+    {
+      "adapter": "claude_cli",
+      "session_id": "97e26daa-72c1-43be-be91-b4008018cd76",
+      "connected": true,
+      "switched": true,
+      "status_flow": [],
+      "chunks": [
+        "已创建完成。文件 `hello_claude_cli.txt` 位于当前工作目录，内容为 `hello from claude_cli`。\n"
+      ],
+      "complete": {
+        "status": "success",
+        "duration_ms": null,
+        "artifacts": [],
+        "error_message": null
+      },
+      "error": null,
+      "file_created": true,
+      "duration_ms": 8472
+    },
+    {
+      "adapter": "opencode_cli",
+      "session_id": "36448c0f-37a0-4bee-b04d-8ab8a7d08048",
+      "connected": true,
+      "switched": true,
+      "status_flow": [
+        "outputting"
+      ],
+      "chunks": [
+        "{\"type\": \"step_start\", \"timestamp\": 1781605072522, \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"part\": {\"id\": \"prt_ecfeffe860015UptMyQcmf02Rp\", \"messageID\": \"msg_ecfeffb810018PFDImsuS8EyPG\", \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"type\": \"step-start\"}}\n",
+        "{\"type\": \"tool_use\", \"timestamp\": 1781605073632, \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"part\": {\"type\": \"tool\", \"tool\": \"write\", \"callID\": \"call_00_KJod5uZYgnAWy1cH6WAO2322\", \"state\": {\"status\": \"completed\", \"input\": {\"filePath\": \"/Users/fuyuuku/ACP_AGENT2/test_workspace/hello_opencode_cli.txt\", \"content\": \"hello from opencode_cli\"}, \"output\": \"Wrote file successfully.\", \"metadata\": {\"diagnostics\": {}, \"filepath\": \"/Users/fuyuuku/ACP_AGENT2/test_workspace/hello_opencode_cli.txt\", \"exists\": false, \"truncated\": false}, \"title\": \"test_workspace/hello_opencode_cli.txt\", \"time\": {\"start\": 1781605073625, \"end\": 1781605073631}}, \"id\": \"prt_ecff001940016MM0mWO1cLMwZ7\", \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"messageID\": \"msg_ecfeffb810018PFDImsuS8EyPG\"}}\n",
+        "{\"type\": \"step_finish\", \"timestamp\": 1781605073750, \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"part\": {\"id\": \"prt_ecff00353001PnoIvz9A6GFo6G\", \"reason\": \"tool-calls\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"messageID\": \"msg_ecfeffb810018PFDImsuS8EyPG\", \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"type\": \"step-finish\", \"tokens\": {\"total\": 7579, \"input\": 158, \"output\": 87, \"reasoning\": 38, \"cache\": {\"write\": 0, \"read\": 7296}}, \"cost\": 7.75488e-05}}\n",
+        "{\"type\": \"step_start\", \"timestamp\": 1781605074182, \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"part\": {\"id\": \"prt_ecff00503001XdffGTAEM6IQ3w\", \"messageID\": \"msg_ecff00384001J8lH662eEwG1em\", \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"type\": \"step-start\"}}\n",
+        "已完成。文件 `hello_opencode_cli.txt` 已创建在当前工作目录中。",
+        "{\"type\": \"step_finish\", \"timestamp\": 1781605075247, \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"part\": {\"id\": \"prt_ecff0092d001t0ycpFZ7DwmuKi\", \"reason\": \"stop\", \"snapshot\": \"cea7e028b8d316aaaedc8661ab544d1473bde8e8\", \"messageID\": \"msg_ecff00384001J8lH662eEwG1em\", \"sessionID\": \"ses_130100a08ffePXX5A2wB2qe7RV\", \"type\": \"step-finish\", \"tokens\": {\"total\": 7627, \"input\": 43, \"output\": 20, \"reasoning\": 12, \"cache\": {\"write\": 0, \"read\": 7552}}, \"cost\": 3.61256e-05}}\n"
+      ],
+      "complete": {
+        "status": "success",
+        "duration_ms": null,
+        "artifacts": [],
+        "error_message": null
+      },
+      "error": null,
+      "file_created": true,
+      "duration_ms": 5958
+    }
+  ]
+}
