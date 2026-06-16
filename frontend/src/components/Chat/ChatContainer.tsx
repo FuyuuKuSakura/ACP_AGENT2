@@ -45,7 +45,7 @@ export default function ChatContainer({ sendMessage }: ChatContainerProps) {
   return (
     <div
       ref={scrollRef}
-      className="flex flex-1 flex-col overflow-y-auto scrollbar-thin"
+      className="flex min-w-0 flex-1 flex-col overflow-y-auto scrollbar-thin"
     >
 
       <MessageStream messages={messages} />

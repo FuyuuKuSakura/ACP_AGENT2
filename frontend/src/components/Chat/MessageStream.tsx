@@ -10,7 +10,7 @@ interface MessageStreamProps {
 
 export default function MessageStream({ messages }: MessageStreamProps) {
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
+    <div className="flex min-w-0 flex-col gap-4 px-4 py-4">
       {messages.map((message) => {
         if (message.role === 'user') {
           return <UserMessage key={message.id} content={message.content} />

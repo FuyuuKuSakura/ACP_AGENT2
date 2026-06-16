@@ -44,7 +44,7 @@ function CodeBlock({ children }: { children: React.ReactNode }) {
           <Copy className="h-4 w-4" />
         )}
       </button>
-      <pre className="markdown-body">
+      <pre className="markdown-body overflow-x-auto whitespace-pre-wrap break-all">
         <code ref={codeRef}>{children}</code>
       </pre>
     </div>

@@ -12,7 +12,7 @@ export default function AgentMessage({ content, status }: AgentMessageProps) {
 
   return (
     <div className="flex justify-start">
-      <div className="cel-bubble-agent relative max-w-4/5 rounded-2xl rounded-tl-sm px-4 py-2.5 text-dionysus-text-primary">
+      <div className="cel-bubble-agent relative max-w-4/5 min-w-0 overflow-hidden rounded-2xl rounded-tl-sm px-4 py-2.5 text-dionysus-text-primary">
         {status === 'interrupted' && (
           <span className="absolute -top-2 right-3 rounded-full border-2 border-black/20 bg-dionysus-danger px-2 py-0.5 text-xs font-medium text-white shadow-sm">
             已中断
