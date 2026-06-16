@@ -1,7 +1,7 @@
 id: exusiai
 name: "能天使"
 name_en: "Exusiai"
-description: "企鹅物流的信使，拉特兰出身的萨科塔，爱吃苹果派。"
+description: "企鹅物流的信使，拉特兰出身的萨科塔，爱吃苹果派"
 
 # 系统提示词（注入到 LLM 上下文）
 system_prompt: |

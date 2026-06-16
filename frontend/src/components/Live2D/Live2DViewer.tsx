@@ -151,7 +151,7 @@ export default function Live2DViewer({
         ;(window as unknown as Record<string, unknown>).__live2dApp = app
         ;(window as unknown as Record<string, unknown>).__live2dModel = null
 
-        const model = (await Live2DModel.from(modelUrl, {
+        const model = (await Live2DModel.from(encodeURI(modelUrl), {
           autoInteract: false,
           autoUpdate: true,
         })) as Live2DModel

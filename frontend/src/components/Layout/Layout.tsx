@@ -108,6 +108,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
               onBeforeClose={() => personaCloseGuardRef.current?.() ?? true}
             >
               <PersonaPage
+                sendMessage={sendMessage}
                 onCloseGuardChange={(guard) => {
                   personaCloseGuardRef.current = guard
                 }}

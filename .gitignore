@@ -24,6 +24,10 @@ backend/*.sqlite3
 
  # Live2D models uploaded via the UI (per-persona runtime assets)
 backend/config/personas/live2d/
+backend/config/personas/corpus/
+# Runtime-created persona files (keep only the bundled example)
+backend/config/personas/*.yaml
+!backend/config/personas/exusiai.yaml
 kal'tsit_live2d/
 
  # Build artifacts

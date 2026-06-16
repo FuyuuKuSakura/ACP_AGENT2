@@ -35,6 +35,15 @@ def _agent_settings_path() -> Path:
     return Path(__file__).parent.parent / "data" / "agent_settings.json"
 
 
+def _wallpaper_settings_path() -> Path:
+    return Path(__file__).parent.parent / "data" / "wallpaper_settings.json"
+
+
+_DEFAULT_WALLPAPER_OPACITY = 0.15
+_DEFAULT_WALLPAPER_BLUR = 8
+_DEFAULT_WALLPAPER_BRIGHTNESS = 0.7
+
+
 def _load_server_settings(config: Any) -> None:
     path = _server_settings_path()
     if not path.exists():
@@ -71,6 +80,32 @@ def _save_agent_settings(data: dict[str, Any]) -> None:
     path = _agent_settings_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _load_wallpaper_settings() -> dict[str, Any] | None:
+    path = _wallpaper_settings_path()
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("failed_to_load_wallpaper_settings", error=str(exc))
+        return None
+
+
+def _save_wallpaper_settings(data: dict[str, Any]) -> None:
+    path = _wallpaper_settings_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _default_wallpaper_response() -> dict[str, Any]:
+    return {
+        "url": None,
+        "opacity": _DEFAULT_WALLPAPER_OPACITY,
+        "blur": _DEFAULT_WALLPAPER_BLUR,
+        "brightness": _DEFAULT_WALLPAPER_BRIGHTNESS,
+    }
 
 
 def configure_logging() -> None:
@@ -136,6 +171,45 @@ def create_app() -> FastAPI:
         """List all persona configuration files."""
         return JSONResponse(content=list_personas())
 
+    @app.post("/api/personas")
+    async def create_persona(request: Request) -> JSONResponse:
+        """Create a new persona from a YAML payload."""
+        try:
+            body = await request.json()
+        except Exception as exc:
+            return JSONResponse(
+                status_code=400, content={"error": "invalid_json", "detail": str(exc)}
+            )
+        yaml_text = body.get("yaml", "")
+        try:
+            parsed = yaml.safe_load(yaml_text)
+        except yaml.YAMLError as exc:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "invalid_yaml", "detail": str(exc)},
+            )
+        if not isinstance(parsed, dict):
+            return JSONResponse(
+                status_code=400,
+                content={"error": "invalid_yaml", "detail": "top level must be a mapping"},
+            )
+        persona_id = parsed.get("id")
+        persona_name = parsed.get("name")
+        if not persona_id or not persona_name:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "missing_id_or_name"},
+            )
+        persona_path = get_config_dir() / "personas" / f"{persona_id}.yaml"
+        if persona_path.exists():
+            return JSONResponse(
+                status_code=409,
+                content={"error": "persona_already_exists"},
+            )
+        persona_path.parent.mkdir(parents=True, exist_ok=True)
+        persona_path.write_text(yaml_text, encoding="utf-8")
+        return JSONResponse(content={"ok": True, "id": persona_id, "name": persona_name})
+
     @app.get("/api/personas/{persona_id}")
     async def get_persona(persona_id: str) -> JSONResponse:
         """Return a persona YAML file as raw text."""
@@ -180,22 +254,61 @@ def create_app() -> FastAPI:
         persona_path.write_text(yaml_text, encoding="utf-8")
         return JSONResponse(content={"ok": True, "id": persona_id})
 
+    @app.get("/api/personas/{persona_id}/corpus")
+    async def get_persona_corpus(persona_id: str) -> JSONResponse:
+        """Return the corpus text for a persona, if any."""
+        corpus_path = get_config_dir() / "personas" / "corpus" / f"{persona_id}.txt"
+        if not corpus_path.exists():
+            return JSONResponse(content={"ok": True, "text": ""})
+        try:
+            text = corpus_path.read_text(encoding="utf-8")
+            return JSONResponse(content={"ok": True, "text": text})
+        except Exception as exc:
+            logger.warning("get_persona_corpus_failed", error=str(exc))
+            return JSONResponse(
+                status_code=500, content={"error": "read_failed", "detail": str(exc)}
+            )
+
     @app.post("/api/personas/{persona_id}/corpus")
-    async def upload_persona_corpus(
-        persona_id: str, file: UploadFile = File(...)
+    async def save_persona_corpus(
+        persona_id: str, request: Request
     ) -> JSONResponse:
-        """Upload a corpus file for a persona."""
-        if not file.filename:
-            return JSONResponse(
-                status_code=400, content={"error": "missing_filename"}
-            )
-        if not file.filename.endswith(".txt"):
-            return JSONResponse(
-                status_code=400, content={"error": "only_txt_files_allowed"}
-            )
+        """Save a corpus for a persona from JSON text or uploaded .txt file."""
+        content_type = request.headers.get("content-type", "")
         corpus_dir = get_config_dir() / "personas" / "corpus"
         corpus_dir.mkdir(parents=True, exist_ok=True)
         target = corpus_dir / f"{persona_id}.txt"
+
+        if "application/json" in content_type:
+            try:
+                body = await request.json()
+            except Exception as exc:
+                return JSONResponse(
+                    status_code=400, content={"error": "invalid_json", "detail": str(exc)}
+                )
+            text = body.get("text", "")
+            try:
+                target.write_text(text, encoding="utf-8")
+                return JSONResponse(
+                    content={"ok": True, "path": str(target), "size": len(text)}
+                )
+            except Exception as exc:
+                logger.warning("save_persona_corpus_failed", error=str(exc))
+                return JSONResponse(
+                    status_code=500, content={"error": "save_failed", "detail": str(exc)}
+                )
+
+        # Fallback to multipart file upload.
+        form = await request.form()
+        file = form.get("file")
+        if file is None or not isinstance(file, UploadFile):
+            return JSONResponse(
+                status_code=400, content={"error": "missing_file"}
+            )
+        if not file.filename or not file.filename.endswith(".txt"):
+            return JSONResponse(
+                status_code=400, content={"error": "only_txt_files_allowed"}
+            )
         content = await file.read()
         if len(content) > 5 * 1024 * 1024:
             return JSONResponse(
@@ -456,6 +569,12 @@ def create_app() -> FastAPI:
     _wallpaper_dir = Path(__file__).parent.parent / "data" / "wallpapers"
     _wallpaper_dir.mkdir(parents=True, exist_ok=True)
 
+    def _clear_wallpaper_dir() -> None:
+        """Remove all files in the wallpapers directory."""
+        for old in _wallpaper_dir.iterdir():
+            if old.is_file():
+                old.unlink()
+
     @app.post("/api/wallpaper")
     async def upload_wallpaper(file: UploadFile = File(...)) -> JSONResponse:
         """Upload a wallpaper image, replacing any existing one."""
@@ -469,13 +588,16 @@ def create_app() -> FastAPI:
                 status_code=400, content={"error": "unsupported_image_format"}
             )
         try:
-            # Remove old wallpapers so the directory always contains exactly one.
-            for old in _wallpaper_dir.iterdir():
-                if old.is_file():
-                    old.unlink()
+            _clear_wallpaper_dir()
             target = _wallpaper_dir / f"wallpaper{ext}"
             content = await file.read()
             target.write_bytes(content)
+            _save_wallpaper_settings({
+                "url": f"/wallpapers/{target.name}",
+                "opacity": _DEFAULT_WALLPAPER_OPACITY,
+                "blur": _DEFAULT_WALLPAPER_BLUR,
+                "brightness": _DEFAULT_WALLPAPER_BRIGHTNESS,
+            })
             return JSONResponse(
                 content={"ok": True, "url": f"/wallpapers/{target.name}"}
             )
@@ -485,16 +607,59 @@ def create_app() -> FastAPI:
                 status_code=500, content={"error": "save_failed", "detail": str(exc)}
             )
 
+    @app.post("/api/wallpaper/config")
+    async def save_wallpaper_config(request: Request) -> JSONResponse:
+        """Persist wallpaper URL and effect parameters."""
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse(
+                status_code=400, content={"error": "invalid_json"}
+            )
+        url = body.get("url")
+        opacity = body.get("opacity", _DEFAULT_WALLPAPER_OPACITY)
+        blur = body.get("blur", _DEFAULT_WALLPAPER_BLUR)
+        brightness = body.get("brightness", _DEFAULT_WALLPAPER_BRIGHTNESS)
+        try:
+            settings = _load_wallpaper_settings() or _default_wallpaper_response()
+            settings["url"] = url
+            settings["opacity"] = float(opacity)
+            settings["blur"] = int(blur)
+            settings["brightness"] = float(brightness)
+            _save_wallpaper_settings(settings)
+        except Exception as exc:
+            logger.warning("save_wallpaper_settings_failed", error=str(exc))
+            return JSONResponse(
+                status_code=500,
+                content={"error": "save_failed", "detail": str(exc)},
+            )
+        return JSONResponse(content={"ok": True, "url": url})
+
     @app.get("/api/wallpaper")
     async def get_wallpaper() -> JSONResponse:
-        """Return the URL of the currently saved wallpaper, if any."""
+        """Return persisted wallpaper configuration, if any."""
+        settings = _load_wallpaper_settings()
+        if settings is not None:
+            return JSONResponse(content=settings)
+        return JSONResponse(
+            status_code=404,
+            content=_default_wallpaper_response(),
+        )
+
+    @app.delete("/api/wallpaper")
+    async def delete_wallpaper() -> JSONResponse:
+        """Remove persisted wallpaper settings and clear uploaded images."""
         try:
-            for entry in _wallpaper_dir.iterdir():
-                if entry.is_file():
-                    return JSONResponse(content={"url": f"/wallpapers/{entry.name}"})
+            settings_path = _wallpaper_settings_path()
+            if settings_path.exists():
+                settings_path.unlink()
+            _clear_wallpaper_dir()
+            return JSONResponse(content={"ok": True})
         except Exception as exc:
-            logger.warning("get_wallpaper_failed", error=str(exc))
-        return JSONResponse(status_code=404, content={"url": None})
+            logger.warning("delete_wallpaper_failed", error=str(exc))
+            return JSONResponse(
+                status_code=500, content={"error": "delete_failed", "detail": str(exc)}
+            )
 
     # Mount static files last so API/WebSocket routes take precedence.
     static_dir = Path(config.server.static_dir)

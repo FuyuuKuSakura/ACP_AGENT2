@@ -28,6 +28,7 @@ export default function PalettePage() {
   const { setTrackingEnabled } = useLive2DStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [wallpaperInput, setWallpaperInput] = useState(wallpaperUrl)
+  const initialLoadDone = useRef(false)
 
   useEffect(() => {
     loadAllThemes().then(setAvailableThemes).catch(() => {
@@ -40,18 +41,52 @@ export default function PalettePage() {
   }, [wallpaperUrl])
 
   useEffect(() => {
-    // Restore wallpaper from the server if one has been persisted.
+    // Restore wallpaper configuration from the server if one has been persisted.
     fetch('/api/wallpaper')
-      .then((r) => (r.ok ? r.json() : null))
+      .then((r) => r.json())
       .then((data) => {
-        if (data?.url) {
-          setWallpaperUrl(data.url)
+        if (data) {
+          if (data.url) {
+            setWallpaperUrl(data.url)
+          }
+          if (typeof data.opacity === 'number') {
+            setWallpaperOpacity(data.opacity)
+          }
+          if (typeof data.blur === 'number') {
+            setWallpaperBlur(data.blur)
+          }
+          if (typeof data.brightness === 'number') {
+            setWallpaperBrightness(data.brightness)
+          }
         }
       })
       .catch(() => {
-        // Keep local value if server has no wallpaper.
+        // Keep local values if server request fails.
       })
-  }, [setWallpaperUrl])
+  }, [setWallpaperUrl, setWallpaperOpacity, setWallpaperBlur, setWallpaperBrightness])
+
+  // Persist slider parameter changes to the server (debounced).
+  useEffect(() => {
+    if (!initialLoadDone.current) {
+      initialLoadDone.current = true
+      return
+    }
+    const timer = setTimeout(() => {
+      fetch('/api/wallpaper/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: wallpaperUrl || null,
+          opacity: wallpaperOpacity,
+          blur: wallpaperBlur,
+          brightness: wallpaperBrightness,
+        }),
+      }).catch(() => {
+        // Ignore network errors; local state is already updated.
+      })
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [wallpaperOpacity, wallpaperBlur, wallpaperBrightness])
 
   const handleLive2dChange = (enabled: boolean) => {
     setLive2dEnabled(enabled)
@@ -85,8 +120,39 @@ export default function PalettePage() {
     reader.readAsDataURL(file)
   }
 
+  const saveWallpaperConfig = async (url: string) => {
+    try {
+      await fetch('/api/wallpaper/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: url || null,
+          opacity: wallpaperOpacity,
+          blur: wallpaperBlur,
+          brightness: wallpaperBrightness,
+        }),
+      })
+    } catch {
+      // Ignore network errors; local state is already updated.
+    }
+  }
+
   const applyWallpaperUrl = () => {
-    setWallpaperUrl(wallpaperInput.trim())
+    const url = wallpaperInput.trim()
+    setWallpaperUrl(url)
+    saveWallpaperConfig(url)
+  }
+
+  const handleReset = async () => {
+    try {
+      await fetch('/api/wallpaper', { method: 'DELETE' })
+    } catch {
+      // Still reset local state even if the server request fails.
+    }
+    resetWallpaper()
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
@@ -226,7 +292,7 @@ export default function PalettePage() {
 
         <button
           type="button"
-          onClick={resetWallpaper}
+          onClick={handleReset}
           className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-text-secondary transition-colors hover:border-dionysus-primary/50 hover:text-dionysus-primary"
         >
           <RotateCcw className="h-3.5 w-3.5" />
