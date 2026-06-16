@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { parseToolCalls } from '@/lib/tools'
 import type {
   ChatMessage,
