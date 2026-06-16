@@ -22,13 +22,15 @@ backend/data/
 backend/*.db
 backend/*.sqlite3
 
- # Live2D models uploaded via the UI (per-persona runtime assets)
-backend/config/personas/live2d/
-backend/config/personas/corpus/
-# Runtime-created persona files (keep only the bundled example)
+ # Runtime-created personas / assets (builtin/ subdirectory is kept)
 backend/config/personas/*.yaml
-!backend/config/personas/exusiai.yaml
+backend/config/personas/*.yml
+backend/config/personas/corpus/*.txt
+backend/config/personas/live2d/
+# Source Live2D folder at project root (copied to frontend/public for bundling)
 kal'tsit_live2d/
+# Keep the bundled Kal'tsit Live2D assets in frontend/public
+!frontend/public/kal'tsit_live2d/
 
  # Build artifacts
 dist/

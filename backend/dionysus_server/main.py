@@ -18,7 +18,14 @@ from fastapi.staticfiles import StaticFiles
 
 from dionysus_server.config import get_config_dir, load_config
 from dionysus_server.models import HandshakeMessage, HandshakePayload
-from dionysus_server.persona.loader import list_personas, load_persona
+from dionysus_server.persona.loader import (
+    _BUILTIN_DIR,
+    _PERSONA_DIR,
+    _persona_path,
+    list_personas,
+    load_persona,
+    persona_exists,
+)
 from dionysus_server.session.manager import SessionManager
 from dionysus_server.theme_manager import delete_theme, get_theme, list_themes, save_theme
 from dionysus_server.websocket.connection import WSConnection
@@ -166,6 +173,20 @@ def create_app() -> FastAPI:
             return JSONResponse(status_code=400, content={"error": error})
         return JSONResponse(content={"ok": True})
 
+    def _ensure_runtime_persona_yaml(persona_id: str) -> Path:
+        """Return the runtime persona YAML path, copying from builtin if needed."""
+        runtime_path = _PERSONA_DIR / f"{persona_id}.yaml"
+        if not runtime_path.exists():
+            builtin_path = _BUILTIN_DIR / f"{persona_id}.yaml"
+            if not builtin_path.exists():
+                builtin_path = _BUILTIN_DIR / f"{persona_id}.yml"
+            if builtin_path.exists():
+                runtime_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(builtin_path, runtime_path)
+            else:
+                runtime_path.parent.mkdir(parents=True, exist_ok=True)
+        return runtime_path
+
     @app.get("/api/personas")
     async def get_personas() -> JSONResponse:
         """List all persona configuration files."""
@@ -200,26 +221,28 @@ def create_app() -> FastAPI:
                 status_code=400,
                 content={"error": "missing_id_or_name"},
             )
-        persona_path = get_config_dir() / "personas" / f"{persona_id}.yaml"
-        if persona_path.exists():
+        if persona_exists(persona_id):
             return JSONResponse(
                 status_code=409,
                 content={"error": "persona_already_exists"},
             )
-        persona_path.parent.mkdir(parents=True, exist_ok=True)
+        persona_path = _ensure_runtime_persona_yaml(persona_id)
         persona_path.write_text(yaml_text, encoding="utf-8")
         return JSONResponse(content={"ok": True, "id": persona_id, "name": persona_name})
 
     @app.get("/api/personas/{persona_id}")
     async def get_persona(persona_id: str) -> JSONResponse:
-        """Return a persona YAML file as raw text."""
-        persona_path = get_config_dir() / "personas" / f"{persona_id}.yaml"
-        if not persona_path.exists():
+        """Return a persona configuration, including runtime model_path."""
+        persona_path = _persona_path(persona_id)
+        if persona_path is None:
             return JSONResponse(status_code=404, content={"error": "persona_not_found"})
+        persona = load_persona(persona_id)
         return JSONResponse(
             content={
+                "ok": True,
                 "id": persona_id,
                 "yaml": persona_path.read_text(encoding="utf-8"),
+                "persona": persona,
             }
         )
 
@@ -234,8 +257,7 @@ def create_app() -> FastAPI:
     @app.post("/api/personas/{persona_id}")
     async def save_persona(persona_id: str, request: Request) -> JSONResponse:
         """Save persona YAML file contents."""
-        persona_path = get_config_dir() / "personas" / f"{persona_id}.yaml"
-        persona_path.parent.mkdir(parents=True, exist_ok=True)
+        persona_path = _ensure_runtime_persona_yaml(persona_id)
         body = await request.json()
         yaml_text = body.get("yaml", "")
         # Basic safety: ensure the text is valid YAML before writing.
@@ -257,7 +279,9 @@ def create_app() -> FastAPI:
     @app.get("/api/personas/{persona_id}/corpus")
     async def get_persona_corpus(persona_id: str) -> JSONResponse:
         """Return the corpus text for a persona, if any."""
-        corpus_path = get_config_dir() / "personas" / "corpus" / f"{persona_id}.txt"
+        corpus_path = _PERSONA_DIR / "corpus" / f"{persona_id}.txt"
+        if not corpus_path.exists():
+            corpus_path = _BUILTIN_DIR / "corpus" / f"{persona_id}.txt"
         if not corpus_path.exists():
             return JSONResponse(content={"ok": True, "text": ""})
         try:
@@ -275,7 +299,7 @@ def create_app() -> FastAPI:
     ) -> JSONResponse:
         """Save a corpus for a persona from JSON text or uploaded .txt file."""
         content_type = request.headers.get("content-type", "")
-        corpus_dir = get_config_dir() / "personas" / "corpus"
+        corpus_dir = _PERSONA_DIR / "corpus"
         corpus_dir.mkdir(parents=True, exist_ok=True)
         target = corpus_dir / f"{persona_id}.txt"
 
@@ -365,7 +389,7 @@ def create_app() -> FastAPI:
             )
 
         # Update the persona YAML with the new model path.
-        persona_path = get_config_dir() / "personas" / f"{persona_id}.yaml"
+        persona_path = _ensure_runtime_persona_yaml(persona_id)
         if persona_path.exists():
             try:
                 yaml_text = persona_path.read_text(encoding="utf-8")
@@ -392,6 +416,41 @@ def create_app() -> FastAPI:
                 "total_size": total_size,
             }
         )
+
+    @app.delete("/api/personas/{persona_id}/live2d")
+    async def delete_persona_live2d(persona_id: str) -> JSONResponse:
+        """Remove the uploaded Live2D model folder and clear the model_path from YAML."""
+        target_dir = _personas_live2d_dir / persona_id
+        try:
+            if target_dir.exists():
+                shutil.rmtree(target_dir)
+        except Exception as exc:
+            logger.warning("delete_live2d_dir_failed", error=str(exc))
+            return JSONResponse(
+                status_code=500,
+                content={"error": "delete_dir_failed", "detail": str(exc)},
+            )
+
+        persona_path = _ensure_runtime_persona_yaml(persona_id)
+        if persona_path.exists():
+            try:
+                yaml_text = persona_path.read_text(encoding="utf-8")
+                parsed = yaml.safe_load(yaml_text) or {}
+                companion = parsed.setdefault("companion", {})
+                live2d_cfg = companion.setdefault("live2d", {})
+                live2d_cfg.pop("model_path", None)
+                persona_path.write_text(
+                    yaml.dump(parsed, allow_unicode=True, sort_keys=False),
+                    encoding="utf-8",
+                )
+            except Exception as exc:
+                logger.warning("clear_live2d_model_path_failed", error=str(exc))
+                return JSONResponse(
+                    status_code=500,
+                    content={"error": "update_persona_failed", "detail": str(exc)},
+                )
+
+        return JSONResponse(content={"ok": True})
 
     @app.get("/api/settings/agent")
     async def get_agent_settings() -> JSONResponse:

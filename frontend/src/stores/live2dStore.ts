@@ -33,8 +33,12 @@ export interface Live2DState {
   pendingMotion: string | null
   /** Timestamp of the last user interaction with the companion. */
   lastActivityAt: number
+  /** Incremented to force the Live2D viewer to reload its model. */
+  modelReloadTrigger: number
   /** Enable or disable mouse tracking. */
   setTrackingEnabled: (enabled: boolean) => void
+  /** Force the Live2D viewer to reload its model. */
+  triggerModelReload: () => void
   /**
    * Set a temporary look-at target.
    * @param target.x Normalized X in range [-1, 1].
@@ -72,8 +76,11 @@ export const useLive2DStore = create<Live2DState>()((set) => ({
   pendingExpression: null,
   pendingMotion: null,
   lastActivityAt: Date.now(),
+  modelReloadTrigger: 0,
 
   setTrackingEnabled: (enabled) => set({ trackingEnabled: enabled }),
+  triggerModelReload: () =>
+    set((state) => ({ modelReloadTrigger: state.modelReloadTrigger + 1 })),
 
   setLookAtTarget: ({ x, y, duration = 2000 }) =>
     set({

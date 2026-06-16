@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { User, Save, Upload, Check, FolderOpen, Plus } from 'lucide-react'
+import { User, Save, Upload, Check, FolderOpen, Plus, Unlink, RefreshCcw } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
+import { useLive2DStore } from '@/stores/live2dStore'
 
 interface PersonaInfo {
   id: string
@@ -22,12 +23,15 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
   const [message, setMessage] = useState<string | null>(null)
   const [corpusFile, setCorpusFile] = useState<File | null>(null)
   const [live2dFiles, setLive2dFiles] = useState<File[]>([])
+  const [live2dPath, setLive2dPath] = useState<string | null>(null)
   const live2dInputRef = useRef<HTMLInputElement>(null)
   const yamlInputRef = useRef<HTMLInputElement>(null)
 
   const sessions = useChatStore((state) => state.sessions)
   const currentSessionId = useChatStore((state) => state.currentSessionId)
   const currentPersonaId = sessions.find((s) => s.id === currentSessionId)?.persona_id
+
+  const isBuiltin = (id: string) => ['exusiai', "kal'tsit"].includes(id)
 
   const refreshPersonas = async (selectId?: string) => {
     try {
@@ -54,6 +58,16 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
     if (!selectedPersona) return
     setCorpusText('')
     setLoadedCorpus('')
+    setLive2dPath(null)
+    fetch(`/api/personas/${selectedPersona}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.ok) {
+          const companion = data.persona?.companion || {}
+          setLive2dPath(companion.live2d?.model_path || null)
+        }
+      })
+      .catch(() => setLive2dPath(null))
     fetch(`/api/personas/${selectedPersona}/corpus`)
       .then((r) => r.json())
       .then((data) => {
@@ -84,6 +98,11 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
         type: 'client_command',
         payload: { command: 'switch_persona', args: id },
       })
+      // Sync the local session so the Live2D viewer reloads immediately.
+      if (currentSessionId) {
+        useChatStore.getState().updateSession(currentSessionId, { persona_id: id })
+      }
+      useLive2DStore.getState().triggerModelReload()
     }
   }
 
@@ -215,12 +234,36 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
       const data = await res.json()
       if (res.ok) {
         setLive2dFiles([])
+        setLive2dPath(data.model_path || null)
         setMessage(`Live2D 模型已更新：${data.model_path}`)
+        useLive2DStore.getState().triggerModelReload()
       } else {
         setMessage(`Live2D 上传失败：${data.error || '未知错误'}`)
       }
     } catch {
       setMessage('Live2D 上传失败')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const unbindLive2dModel = async () => {
+    if (!selectedPersona) return
+    if (!window.confirm('确定要解绑当前 Live2D 模型吗？')) return
+    setSaving(true)
+    setMessage(null)
+    try {
+      const res = await fetch(`/api/personas/${selectedPersona}/live2d`, { method: 'DELETE' })
+      const data = await res.json()
+      if (res.ok) {
+        setLive2dPath(null)
+        setMessage('模型已解绑')
+        useLive2DStore.getState().triggerModelReload()
+      } else {
+        setMessage(`解绑失败：${data.error || '未知错误'}`)
+      }
+    } catch {
+      setMessage('解绑失败')
     } finally {
       setSaving(false)
     }
@@ -327,11 +370,22 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
         <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
           <FolderOpen className="h-4 w-4 text-dionysus-primary" />
           Live2D 模型
+          {live2dPath ? (
+            <span className="ml-2 rounded-full bg-dionysus-success/20 px-2 py-0.5 text-xs text-dionysus-success">已绑定</span>
+          ) : (
+            <span className="ml-2 rounded-full bg-dionysus-text-secondary/20 px-2 py-0.5 text-xs text-dionysus-text-secondary">未绑定</span>
+          )}
         </div>
-        <div className="flex items-center gap-2">
+        {live2dPath ? (
+          <div className="mb-2 rounded-lg border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs text-dionysus-text-secondary">
+            <span className="font-medium text-dionysus-text-primary">路径：</span>
+            <span className="break-all">{live2dPath}</span>
+          </div>
+        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
           <label className="flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-1.5 text-xs font-bold text-dionysus-text-primary transition-all hover:border-dionysus-primary/50">
-            <Upload className="h-3.5 w-3.5" />
-            选择模型文件夹
+            <RefreshCcw className="h-3.5 w-3.5" />
+            {live2dPath ? '更换模型' : '选择模型文件夹'}
             <input
               ref={live2dInputRef}
               type="file"
@@ -352,10 +406,27 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
           >
             上传并应用
           </button>
+          {live2dPath && (
+            <button
+              type="button"
+              onClick={unbindLive2dModel}
+              disabled={saving}
+              className="flex items-center gap-1 rounded-xl border-2 border-dionysus-danger/50 bg-dionysus-danger/10 px-3 py-1.5 text-xs font-bold text-dionysus-danger transition-all hover:bg-dionysus-danger/20 disabled:opacity-50"
+            >
+              <Unlink className="h-3.5 w-3.5" />
+              解绑模型
+            </button>
+          )}
         </div>
-        <p className="mt-2 text-xs text-dionysus-text-secondary">
-          请选择包含 .model3.json 入口文件的 Live2D 模型文件夹。
-        </p>
+        {isBuiltin(selectedPersona) ? (
+          <p className="mt-2 text-xs text-dionysus-text-secondary">
+            当前为内置角色，上传新模型会复制到该角色的运行时配置中，不会修改内置文件。
+          </p>
+        ) : (
+          <p className="mt-2 text-xs text-dionysus-text-secondary">
+            请选择包含 .model3.json 入口文件的 Live2D 模型文件夹。
+          </p>
+        )}
       </section>
     </div>
   )

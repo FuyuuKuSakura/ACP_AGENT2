@@ -86,6 +86,7 @@ export default function Live2DViewer({
     clearPendingExpression,
     clearPendingMotion,
     bumpActivity,
+    modelReloadTrigger,
   } = useLive2DStore()
 
   useEffect(() => {
@@ -268,7 +269,7 @@ export default function Live2DViewer({
       modelRef.current = null
       appRef.current = null
     }
-  }, [retryKey, enabled, modelUrl])
+  }, [retryKey, enabled, modelUrl, modelReloadTrigger])
 
   // Drive model parameters from mouse tracking output.
   useEffect(() => {

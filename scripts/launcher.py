@@ -149,14 +149,31 @@ def main() -> int:
             backend_status = backend_proc.poll()
             frontend_status = frontend_proc.poll() if frontend_proc else None
             if backend_status is not None:
-                print(f"[launcher] backend exited with {backend_status}", file=sys.stderr)
+                print(f"[launcher] backend exited with {backend_status}, restarting...", file=sys.stderr)
                 if frontend_proc:
                     frontend_proc.terminate()
-                return backend_status
+                    try:
+                        frontend_proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        frontend_proc.kill()
+                backend_proc = subprocess.Popen(
+                    backend_cmd,
+                    cwd=backend_dir,
+                    env=env,
+                )
+                if not wait_for_url(f"http://127.0.0.1:{args.backend_port}/api/server/info"):
+                    print("[launcher] backend failed to restart", file=sys.stderr)
+                    backend_proc.terminate()
+                    return 1
+                print("[launcher] backend restarted")
+                continue
             if frontend_status is not None:
-                print(f"[launcher] frontend exited with {frontend_status}", file=sys.stderr)
-                backend_proc.terminate()
-                return frontend_status
+                print(f"[launcher] frontend exited with {frontend_status}, restarting...", file=sys.stderr)
+                frontend_proc = subprocess.Popen(
+                    frontend_cmd,
+                    cwd=frontend_dir,
+                )
+                continue
             time.sleep(1)
     except KeyboardInterrupt:
         shutdown(None, None)
