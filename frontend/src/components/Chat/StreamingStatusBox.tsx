@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
 import { parseToolCalls } from '@/lib/tools'
 import MarkdownRenderer from './MarkdownRenderer'
+import ThinkingSection from './ThinkingSection'
 
 interface StreamingStatusBoxProps {
   content?: string
   status?: string
   detail?: string
+  thinking?: string
 }
 
 function formatElapsed(seconds: number): string {
@@ -18,6 +20,7 @@ export default function StreamingStatusBox({
   content = '',
   status = 'thinking',
   detail = '思考中…',
+  thinking,
 }: StreamingStatusBoxProps) {
   const [elapsed, setElapsed] = useState(0)
   const { displayContent } = parseToolCalls(content)
@@ -54,6 +57,7 @@ export default function StreamingStatusBox({
   return (
     <div className="flex justify-start">
       <div className="cel-bubble-agent max-w-4/5 rounded-2xl rounded-tl-sm px-4 py-2.5 text-dionysus-text-primary">
+        <ThinkingSection thinking={thinking ?? ''} />
         <div className="mb-2 flex items-center gap-2 border-b-2 border-dionysus-border pb-1.5">
           <Loader2 className="h-4 w-4 animate-spin text-dionysus-primary" />
           <span className="text-xs font-medium text-dionysus-text-secondary">{statusText}</span>

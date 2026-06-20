@@ -146,9 +146,10 @@ class CodeBuddyStrategy(JSONStreamStrategy):
                             AgentEvent(
                                 type="agent_stream",
                                 payload={
-                                    "chunk": f"思考: {thinking}\n",
+                                    "chunk": thinking,
                                     "is_final": False,
                                     "status": "thinking",
+                                    "is_thinking": True,
                                 },
                             )
                         )

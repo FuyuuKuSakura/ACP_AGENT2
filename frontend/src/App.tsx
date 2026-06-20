@@ -117,6 +117,7 @@ function App() {
         break
       }
       case 'agent_stream': {
+        const isThinking = message.payload.is_thinking === true
         if (isCurrentSession) {
           store.setStreaming(true)
           store.setSessionStatus('streaming')
@@ -124,13 +125,17 @@ function App() {
             status: message.payload.status,
             detail: '',
           })
-          const toolChunk = parseToolChunk(message.payload.chunk)
-          if (toolChunk?.type === 'tool_call' && toolChunk.call) {
-            store.addToolCall({ name: toolChunk.call.name, args: toolChunk.call.args })
-          } else if (toolChunk?.type === 'tool_result') {
-            store.updateActiveToolResult(toolChunk.result ?? '')
+          if (isThinking) {
+            store.addThinkingChunk(message.payload.chunk)
           } else {
-            store.addAgentChunk(message.payload.chunk)
+            const toolChunk = parseToolChunk(message.payload.chunk)
+            if (toolChunk?.type === 'tool_call' && toolChunk.call) {
+              store.addToolCall({ name: toolChunk.call.name, args: toolChunk.call.args })
+            } else if (toolChunk?.type === 'tool_result') {
+              store.updateActiveToolResult(toolChunk.result ?? '')
+            } else {
+              store.addAgentChunk(message.payload.chunk)
+            }
           }
         } else if (targetSessionId) {
           store.setSessionStatusById(targetSessionId, 'streaming')
@@ -138,7 +143,11 @@ function App() {
             status: message.payload.status,
             detail: '',
           })
-          store.addAgentChunkToSession(targetSessionId, message.payload.chunk)
+          if (isThinking) {
+            store.addThinkingChunkToSession(targetSessionId, message.payload.chunk)
+          } else {
+            store.addAgentChunkToSession(targetSessionId, message.payload.chunk)
+          }
         }
         break
       }
