@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { X } from 'lucide-react'
 
 interface OverlayPageProps {
   isOpen: boolean
@@ -43,8 +44,17 @@ export default function OverlayPage({
           aria-modal="true"
           aria-label={title}
         >
-          <div className="flex h-14 flex-shrink-0 items-center border-b border-dionysus-subtle-border px-4">
+          <div className="flex h-14 flex-shrink-0 items-center justify-between border-b border-dionysus-subtle-border px-4">
             <h2 className="text-base font-semibold text-dionysus-text-primary">{title}</h2>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="rounded-full p-2 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight hover:text-dionysus-text-primary"
+              aria-label={`关闭${title}`}
+              title={`关闭${title}`}
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
           <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">{children}</div>
         </motion.div>

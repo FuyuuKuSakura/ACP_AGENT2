@@ -54,8 +54,8 @@ export default function QRCodeButton() {
       {url ? (
         <>
           <img
-            src={`/api/server/qr?url=${encodeURIComponent(url)}`}
-            alt="QR"
+            src="/api/pair/qr"
+            alt="配对二维码"
             className="mx-auto block h-44 w-44 rounded-lg bg-white object-contain p-2"
           />
           <div className="mt-2 break-all text-center text-xs text-dionysus-text-secondary">
@@ -75,6 +75,7 @@ export default function QRCodeButton() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         title="连接二维码"
+        aria-label="连接二维码"
         className="flex h-11 w-11 items-center justify-center rounded-xl text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight hover:text-dionysus-primary"
       >
         <QrCode className="h-5 w-5" />

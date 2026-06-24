@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Plus, Trash2, Pencil } from 'lucide-react'
+import { Plus, Trash2, Pencil, MoreVertical } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLayoutStore } from '@/stores/layoutStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -53,11 +53,24 @@ export default function SessionList({ sendMessage }: SessionListProps) {
     setContextMenu({ x: e.clientX, y: e.clientY, sessionId: session.id })
   }
 
+  const handleMenuClick = (e: React.MouseEvent, session: Session) => {
+    e.stopPropagation()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    setContextMenu({ x: rect.left, y: rect.bottom + 4, sessionId: session.id })
+  }
+
   const startRename = () => {
     const session = sessions.find((s) => s.id === contextMenu?.sessionId)
     if (session) {
       setEditingId(session.id)
       setEditingTitle(session.title)
+    }
+    setContextMenu(null)
+  }
+
+  const handleDelete = () => {
+    if (contextMenu) {
+      deleteSession(contextMenu.sessionId)
     }
     setContextMenu(null)
   }
@@ -83,8 +96,17 @@ export default function SessionList({ sendMessage }: SessionListProps) {
         setContextMenu(null)
       }
     }
-    window.addEventListener('mousedown', handleClick)
-    return () => window.removeEventListener('mousedown', handleClick)
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setContextMenu(null)
+      }
+    }
+    window.addEventListener('mousedown', handleClick, true)
+    window.addEventListener('keydown', handleKey)
+    return () => {
+      window.removeEventListener('mousedown', handleClick, true)
+      window.removeEventListener('keydown', handleKey)
+    }
   }, [contextMenu])
 
   return (
@@ -169,14 +191,23 @@ export default function SessionList({ sendMessage }: SessionListProps) {
                       />
                     ) : (
                       <>
-                        <div className="truncate text-sm font-medium text-dionysus-text-primary">
+                        <div className="truncate pr-6 text-sm font-medium text-dionysus-text-primary">
                           {session.title}
                         </div>
-                        <div className="truncate text-xs text-dionysus-text-secondary">
+                        <div className="truncate pr-6 text-xs text-dionysus-text-secondary">
                           {latestMessagePreview(session)}
                         </div>
                       </>
                     )}
+                    <button
+                      type="button"
+                      onClick={(e) => handleMenuClick(e, session)}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-dionysus-text-secondary opacity-0 transition-colors hover:bg-dionysus-glass-highlight hover:text-dionysus-text-primary group-hover:opacity-100 focus:opacity-100"
+                      aria-label="会话操作"
+                      title="会话操作"
+                    >
+                      <MoreVertical className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </li>
               )
@@ -201,7 +232,7 @@ export default function SessionList({ sendMessage }: SessionListProps) {
           </button>
           <button
             type="button"
-            onClick={() => deleteSession(contextMenu.sessionId)}
+            onClick={handleDelete}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-dionysus-danger hover:bg-dionysus-danger/10"
           >
             <Trash2 className="h-3.5 w-3.5" />

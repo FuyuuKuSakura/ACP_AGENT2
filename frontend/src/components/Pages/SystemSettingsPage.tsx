@@ -129,6 +129,8 @@ export default function SystemSettingsPage() {
   }
 
   const clearLocalCache = () => {
+    const confirmed = window.confirm('确定要清除本地缓存吗？这会清空本地会话历史与设置，但不会影响后端角色、语料和模型文件。')
+    if (!confirmed) return
     const keysToRemove: string[] = []
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
