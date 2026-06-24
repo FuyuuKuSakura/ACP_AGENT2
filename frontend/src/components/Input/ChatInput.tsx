@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { FileSearch, Zap, FolderOpen, List, History, Send } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
+import { useLayoutStore } from '@/stores/layoutStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 
 interface ChatInputProps {
@@ -84,6 +85,8 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
             mode: command.mode ?? activeMode,
           },
         })
+        // On mobile, expand the companion drawer so the user sees the character react.
+        useLayoutStore.getState().setCompanionDrawerOpen(true)
       } else {
         sendMessage({
           type: 'client_command',

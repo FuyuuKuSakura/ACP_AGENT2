@@ -1,0 +1,28 @@
+id: tech_flat
+name: "Tech-Flat 工业蓝"
+mode: dark
+fonts:
+  body: '"Inter", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif'
+  code: '"JetBrains Mono", "Fira Code", "SF Mono", monospace'
+colors:
+  primary: "#3b82f6"
+  primaryHover: "#60a5fa"
+  accent: "#06b6d4"
+  background: "#0a0f1a"
+  chatBackground: "#0f172a"
+  userBubble: "#3b82f6"
+  agentBubbleLight: "#ffffff"
+  agentBubbleDark: "rgba(30, 41, 59, 0.72)"
+  textPrimaryLight: "#0f172a"
+  textPrimaryDark: "#e2e8f0"
+  textSecondary: "#94a3b8"
+  system: "#64748b"
+  danger: "#ef4444"
+  success: "#22c55e"
+  codeBackgroundLight: "#f1f5f9"
+  codeBackgroundDark: "#020617"
+  borderLight: "rgba(0, 0, 0, 0.08)"
+  borderDark: "rgba(148, 163, 184, 0.16)"
+assets:
+  manifestThemeColor: "#0a0f1a"
+  manifestBackgroundColor: "#0a0f1a"

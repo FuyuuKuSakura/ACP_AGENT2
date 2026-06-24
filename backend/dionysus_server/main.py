@@ -19,6 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 from dionysus_server.config import get_config_dir, load_config
 from dionysus_server.models import HandshakeMessage, HandshakePayload, ServerMessage
+from dionysus_server.pairing import PairingManager
 from dionysus_server.paths import get_data_dir, resolve_config_path
 from dionysus_server.persona.loader import (
     _BUILTIN_DIR,
@@ -676,6 +677,67 @@ def create_app() -> FastAPI:
         buf.seek(0)
         return StreamingResponse(buf, media_type="image/png")
 
+    @app.post("/api/pair/token")
+    async def create_pair_token(request: Request) -> JSONResponse:
+        """Create a short-lived pair token for mobile onboarding."""
+        token = pairing_manager.create_pair_token()
+        host = request.headers.get("host", f"{config.server.host}:{config.server.port}")
+        scheme = request.headers.get("x-forwarded-proto", "http")
+        return JSONResponse(
+            content={
+                "pair_token": token,
+                "expires_in": 300,
+                "host": f"{scheme}://{host}",
+            }
+        )
+
+    @app.get("/api/pair/qr")
+    async def pair_qr(request: Request) -> StreamingResponse:
+        """Generate a QR code containing the pair token and host URL."""
+        token = pairing_manager.create_pair_token()
+        host = request.headers.get("host", f"{config.server.host}:{config.server.port}")
+        scheme = request.headers.get("x-forwarded-proto", "http")
+        payload = json.dumps({"pair_token": token, "host": f"{scheme}://{host}"})
+        img = qrcode.make(payload, box_size=6, border=2)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+        return StreamingResponse(buf, media_type="image/png")
+
+    @app.post("/api/pair")
+    async def pair_device(request: Request) -> JSONResponse:
+        """Exchange a pair token for a long-lived device token."""
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse(status_code=400, content={"error": "invalid_json"})
+        pair_token = body.get("pair_token")
+        if not pair_token:
+            return JSONResponse(status_code=400, content={"error": "missing_pair_token"})
+        device_token = pairing_manager.verify_pair_token(pair_token)
+        if device_token is None:
+            return JSONResponse(status_code=401, content={"error": "invalid_or_expired_pair_token"})
+        return JSONResponse(content={"device_token": device_token})
+
+    @app.get("/api/pair/devices")
+    async def list_paired_devices() -> JSONResponse:
+        """List paired mobile devices."""
+        return JSONResponse(content=pairing_manager.list_devices())
+
+    @app.post("/api/pair/revoke")
+    async def revoke_device(request: Request) -> JSONResponse:
+        """Revoke a device token."""
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse(status_code=400, content={"error": "invalid_json"})
+        device_token = body.get("device_token")
+        if not device_token:
+            return JSONResponse(status_code=400, content={"error": "missing_device_token"})
+        if pairing_manager.revoke_device(device_token):
+            return JSONResponse(content={"ok": True})
+        return JSONResponse(status_code=404, content={"error": "device_not_found"})
+
     @app.get("/api/settings/supervisor")
     async def get_supervisor_settings() -> JSONResponse:
         """Return the companion supervisor configuration."""
@@ -710,6 +772,7 @@ def create_app() -> FastAPI:
         )
 
     manager = SessionManager(config)
+    pairing_manager = PairingManager(get_data_dir())
 
     @app.on_event("startup")
     async def startup() -> None:
