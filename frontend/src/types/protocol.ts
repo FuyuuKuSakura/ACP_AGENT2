@@ -143,6 +143,7 @@ export interface AgentStreamMessage extends BaseMessage {
     chunk: string
     is_final: boolean
     status: StatusEnum
+    is_thinking?: boolean
   }
 }
 
@@ -269,6 +270,7 @@ export interface ChatMessage {
   id: string
   role: MessageRole
   content: string
+  thinking?: string
   timestamp: number
   trace_id: string
   status?: 'streaming' | 'interrupted' | 'complete' | 'error'

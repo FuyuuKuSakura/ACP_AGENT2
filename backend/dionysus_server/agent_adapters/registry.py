@@ -11,7 +11,7 @@ from dionysus_server.config import load_config
 
 from .base import IAgentAdapter
 from .generic_cli import GenericCLIAdapter
-from .strategies import ClaudeStrategy, CodexStrategy, KimiStrategy, OpenCodeStrategy
+from .strategies import ClaudeStrategy, CodeBuddyStrategy, CodexStrategy, KimiStrategy, OpenCodeStrategy
 
 logger = structlog.get_logger()
 
@@ -21,6 +21,7 @@ _STRATEGIES: dict[str, Any] = {
     "claude": ClaudeStrategy,
     "codex": CodexStrategy,
     "opencode": OpenCodeStrategy,
+    "codebuddy": CodeBuddyStrategy,
 }
 
 _TYPE_TO_STRATEGY: dict[str, str] = {
@@ -29,6 +30,7 @@ _TYPE_TO_STRATEGY: dict[str, str] = {
     "claude_code_cli": "claude",
     "codex_cli": "codex",
     "opencode_cli": "opencode",
+    "codebuddy_cli": "codebuddy",
 }
 
 

@@ -179,6 +179,7 @@ class AgentStreamPayload(BaseModel):
     chunk: str
     is_final: bool = False
     status: StatusEnum = StatusEnum.OUTPUTTING
+    is_thinking: bool = False
 
 
 class AgentStreamMessage(BaseModel):

@@ -23,6 +23,7 @@ export default function MessageStream({ messages }: MessageStreamProps) {
             <StreamingStatusBox
               key={message.id}
               content={message.content}
+              thinking={message.thinking}
             />
           )
         }
@@ -30,6 +31,7 @@ export default function MessageStream({ messages }: MessageStreamProps) {
           <AgentMessage
             key={message.id}
             content={message.content}
+            thinking={message.thinking}
             status={message.status}
           />
         )

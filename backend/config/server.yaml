@@ -22,7 +22,7 @@ agent_adapter:
       # Kimi Code CLI prompt mode with stream-json output.
       # The adapter builds args per message: [-S, <session_id>, -p, <text>, --output-format, stream-json]
       output_format: "stream-json"
-      working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
+      working_dir: "../workspace"
       restart_on_crash: true
       max_restart_attempts: 3
       request_timeout_seconds: 120
@@ -32,7 +32,7 @@ agent_adapter:
       command: "claude"
       model: ""
       output_format: "stream-json"
-      working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
+      working_dir: "../workspace"
       restart_on_crash: true
       max_restart_attempts: 3
       request_timeout_seconds: 600
@@ -42,7 +42,7 @@ agent_adapter:
       strategy: "codex"
       command: "codex"
       model: ""
-      working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
+      working_dir: "../workspace"
       restart_on_crash: true
       max_restart_attempts: 3
       request_timeout_seconds: 600
@@ -53,7 +53,18 @@ agent_adapter:
       command: "opencode"
       model: ""
       output_format: "json"
-      working_dir: "/Users/fuyuuku/ACP_AGENT2/test_workspace"
+      working_dir: "../workspace"
+      restart_on_crash: true
+      max_restart_attempts: 3
+      request_timeout_seconds: 600
+      enabled: true
+    codebuddy_cli:
+      type: "codebuddy_cli"
+      strategy: "codebuddy"
+      command: "codebuddy"
+      model: ""
+      output_format: "stream-json"
+      working_dir: "../workspace"
       restart_on_crash: true
       max_restart_attempts: 3
       request_timeout_seconds: 600
@@ -97,3 +108,4 @@ security:
   max_upload_size_mb: 10
   enable_ast_audit: true
   enable_sensitive_filter: true
+
