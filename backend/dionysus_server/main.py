@@ -19,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 from dionysus_server.config import get_config_dir, load_config
 from dionysus_server.models import HandshakeMessage, HandshakePayload, ServerMessage
-from dionysus_server.pairing import PairingManager
+from dionysus_server.pairing import PAIR_TOKEN_TTL_SECONDS, PairingManager
 from dionysus_server.paths import get_data_dir, resolve_config_path
 from dionysus_server.persona.loader import (
     _BUILTIN_DIR,
@@ -686,7 +686,7 @@ def create_app() -> FastAPI:
         return JSONResponse(
             content={
                 "pair_token": token,
-                "expires_in": 300,
+                "expires_in": PAIR_TOKEN_TTL_SECONDS,
                 "host": f"{scheme}://{host}",
             }
         )
@@ -711,6 +711,8 @@ def create_app() -> FastAPI:
             body = await request.json()
         except Exception:
             return JSONResponse(status_code=400, content={"error": "invalid_json"})
+        if not isinstance(body, dict):
+            return JSONResponse(status_code=400, content={"error": "invalid_json_object"})
         pair_token = body.get("pair_token")
         if not pair_token:
             return JSONResponse(status_code=400, content={"error": "missing_pair_token"})
@@ -731,6 +733,8 @@ def create_app() -> FastAPI:
             body = await request.json()
         except Exception:
             return JSONResponse(status_code=400, content={"error": "invalid_json"})
+        if not isinstance(body, dict):
+            return JSONResponse(status_code=400, content={"error": "invalid_json_object"})
         device_token = body.get("device_token")
         if not device_token:
             return JSONResponse(status_code=400, content={"error": "missing_device_token"})
