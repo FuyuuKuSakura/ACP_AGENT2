@@ -1,0 +1,712 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage[hyphens,spaces,obeyspaces]{url}
+
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{accent}{RGB}{59,130,246}
+
+\lstset{
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  showstringspaces=false,
+  keywordstyle=\color{accent},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange}
+}
+
+\lstdefinelanguage{yaml}{
+  keywords={true,false,null,y,n},
+  sensitive=false,
+  comment=[l]{\#},
+  morecomment=[s]{/*}{*/},
+  stringstyle=\color{orange},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstdefinelanguage{css}{
+  keywords={color,background,border,font,box,shadow,linear,gradient,opacity,rgba},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  stringstyle=\color{orange},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent,
+  urlcolor=accent,
+  pdftitle={Dionysus 技术手册},
+  pdfauthor={FuyuuKu樱}
+}
+
+\title{\textbf{Dionysus 技术手册}\\[0.3em]\large 产品功能 · 技术栈 · 项目架构 · 开发指南}
+\author{FuyuuKu樱}
+\date{版本 v0.2.0 \quad 2026-06-24}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\vfill
+\begin{center}
+\textit{让 AI Agent 拥有一个会动、会说的看板娘}
+\end{center}
+\vfill
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{产品概述}
+% ============================================================
+
+\subsection{Dionysus 是什么}
+
+Dionysus（狄俄尼索斯）是一个面向开发者的 \textbf{AI Agent 陪伴型前端}。它在传统 Agent 聊天界面的基础上，引入 \textbf{Live2D 角色陪伴}、\textbf{后台角色播报}、\textbf{多 CLI Agent 适配} 和 \textbf{角色语料系统}，把冰冷的命令行交互变成有角色感、有情绪反馈的协作体验。
+
+你可以把它理解为：
+
+\begin{itemize}[leftmargin=2em]
+  \item 一个能同时接入 Kimi、Claude、Codex、OpenCode 等 CLI Agent 的统一控制台；
+  \item 一个可以自由切换角色、上传语料、绑定 Live2D 模型的角色框架；
+  \item 一个能在后台观察 Agent 工作状态，并用角色口吻实时播报的 Companion Supervisor。
+\end{itemize}
+
+\subsection{核心定位}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{开发者桌面助手}：长期驻留桌面，随时接受自然语言指令。
+  \item \textbf{多 Agent 控制台}：一次启动，管理多个 CLI Agent 会话。
+  \item \textbf{角色化交互层}：用 YAML 定义角色，用 Live2D 表达情绪，用语料塑造语气。
+  \item \textbf{可扩展平台}：角色、适配器、主题均可插拔扩展。
+\end{itemize}
+
+\subsection{目标用户}
+
+\begin{itemize}[leftmargin=2em]
+  \item 频繁使用 CLI Agent（kimi / claude / codex / opencode）的开发者；
+  \item 希望给工具产品增加角色化、情感化交互的独立开发者；
+  \item 对 Live2D、Agent 编排、前端状态管理感兴趣的技术爱好者。
+\end{itemize}
+
+% ============================================================
+\section{功能详解}
+% ============================================================
+
+\subsection{多角色管理}
+
+Dionysus 内置两个示例角色：\textbf{能天使（Exusiai）} 和 \textbf{凯尔希（Kal'tsit）}。每个角色由一份 YAML 配置文件描述，包含：
+
+\begin{itemize}[leftmargin=2em]
+  \item 基础信息：id、name、description
+  \item 系统提示词：system\_prompt
+  \item 语料文件路径：corpus\_file
+  \item 语气规则：tone\_rules
+  \item 表情/动作映射：emotion\_mapping
+  \item 陪伴配置：companion（Live2D、触摸区域、状态映射）
+\end{itemize}
+
+用户可以通过界面：
+
+\begin{enumerate}[leftmargin=2em]
+  \item 切换当前角色；
+  \item 通过表单创建新角色（自动生成默认 YAML）；
+  \item 编辑并保存角色语料；
+  \item 为角色上传并绑定 Live2D 模型。
+\end{enumerate}
+
+\subsection{语料系统}
+
+语料是塑造角色语气的重要素材。Dionysus 提供两种方式维护语料：
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{在线编辑}：在「语料文本」框中直接修改并保存。
+  \item \textbf{文件上传}：选择本地 \texttt{.txt} 文件，上传后自动覆盖当前角色语料。
+\end{itemize}
+
+语料文本会被后端持久化到 \texttt{backend/config/personas/corpus/<persona\_id>.txt}，并在构造系统提示词时被读取。
+
+\subsection{Live2D 角色渲染}
+
+右侧 Companion 面板使用 Pixi.js + pixi-live2d-display 渲染 Live2D 模型。支持：
+
+\begin{itemize}[leftmargin=2em]
+  \item 根据角色切换自动加载对应模型；
+  \item 根据 Agent 状态（thinking / executing / error / success）触发不同表情和动作；
+  \item 鼠标跟踪：角色视线会跟随鼠标移动；
+  \item 模型加载失败时提供「重试加载」按钮。
+\end{itemize}
+
+\subsection{聊天与 Agent 交互}
+
+主界面中部是聊天区，支持：
+
+\begin{itemize}[leftmargin=2em]
+  \item 用户输入与附件；
+  \item Agent 流式输出；
+  \item 工具调用展示（Tool Panel）；
+  \item 选项请求（按钮组 / 下拉框）；
+  \item 中断当前 Agent 响应；
+  \item 会话历史与会话切换。
+\end{itemize}
+
+\subsection{Companion Supervisor}
+
+Supervisor 是 Dionysus 的特色模块。它周期性地扫描当前会话状态，并驱动 Companion 说出与当前状态匹配的角色台词。三种工作模式：
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{disabled}：关闭 Supervisor，Companion 只响应主动消息。
+  \item \textbf{agent\_session}：多开一个 Agent Session，把上下文交给它处理，结果由 Companion 播报。
+  \item \textbf{deepseek\_api}：调用 DeepSeek API 生成播报内容。
+\end{enumerate}
+
+\subsection{Agent 适配器管理}
+
+系统设置页提供对所有 CLI Agent 适配器的管理：
+
+\begin{itemize}[leftmargin=2em]
+  \item 启用/禁用适配器；
+  \item 配置命令路径（如 \texttt{kimi}、\texttt{claude}、\texttt{codex}、\texttt{opencode}）；
+  \item 配置默认模型；
+  \item 保存后重启后端适配器。
+\end{itemize}
+
+\subsection{主题与壁纸}
+
+Dionysus 内置主题系统，支持：
+
+\begin{itemize}[leftmargin=2em]
+  \item 暗色/亮色主题切换；
+  \item 自定义主题色；
+  \item 壁纸背景：上传图片并调节透明度、模糊、亮度。
+\end{itemize}
+
+% ============================================================
+\section{技术栈}
+% ============================================================
+
+\subsection{前端技术栈}
+
+\begin{longtable}{p{3.5cm}p{9cm}}
+\toprule
+\textbf{技术/库} & \textbf{用途} \\
+\midrule
+\endhead
+React 18 & UI 框架，函数组件 + Hooks \\
+TypeScript 5 & 类型安全 \\
+Vite 5 & 构建工具与开发服务器 \\
+TailwindCSS 3 & 原子化 CSS 样式 \\
+Zustand 4 & 全局状态管理（chat、live2d、theme、settings 等） \\
+Lucide React & 图标库 \\
+Framer Motion & 动画 \\
+Pixi.js 7 & 2D 渲染引擎 \\
+pixi-live2d-display & Live2D 模型渲染 \\
+react-markdown + remark-gfm & Markdown 渲染 \\
+Electron 31 & 桌面端打包（可选） \\
+electron-builder & 安装包构建 \\
+\bottomrule
+\end{longtable}
+
+\subsection{后端技术栈}
+
+\begin{longtable}{p{3.5cm}p{9cm}}
+\toprule
+\textbf{技术/库} & \textbf{用途} \\
+\midrule
+\endhead
+Python 3.10+ & 后端语言 \\
+FastAPI 0.110+ & Web 框架 \\
+Uvicorn & ASGI 服务器 \\
+Pydantic v2 & 数据校验与模型 \\
+Pydantic Settings & 配置管理 \\
+aiosqlite & 异步 SQLite 会话存储 \\
+PyYAML & 角色 YAML 解析 \\
+structlog & 结构化日志 \\
+qrcode[pil] & 二维码生成 \\
+pytest & 测试框架 \\
+\bottomrule
+\end{longtable}
+
+\subsection{通信协议}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{WebSocket}：前端与后端的主要实时通信通道，承载用户输入、Agent 流式输出、状态更新、表情动作等。
+  \item \textbf{REST API}：角色、语料、Live2D、Supervisor 设置、Agent 适配器配置等静态/配置型操作。
+\end{itemize}
+
+% ============================================================
+\section{项目架构}
+% ============================================================
+
+\subsection{整体架构图}
+
+Dionysus 采用经典的前后端分离架构：
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\small}]
+  \node[draw, rounded corners, fill=blue!10, minimum width=3cm, minimum height=1cm] (browser) {浏览器 / Electron};
+  \node[draw, rounded corners, fill=green!10, minimum width=3cm, minimum height=1cm, below=of browser] (frontend) {React + Vite 前端};
+  \node[draw, rounded corners, fill=orange!10, minimum width=3cm, minimum height=1cm, below=of frontend] (ws) {WebSocket / REST};
+  \node[draw, rounded corners, fill=red!10, minimum width=3cm, minimum height=1cm, below=of ws] (backend) {FastAPI 后端};
+  \node[draw, rounded corners, fill=purple!10, minimum width=3cm, minimum height=1cm, below=of backend] (agents) {CLI Agent 进程};
+  \node[draw, rounded corners, fill=gray!20, minimum width=3cm, minimum height=1cm, right=of backend] (store) {SQLite / YAML / 文件};
+  \draw[->] (browser) -- (frontend);
+  \draw[->] (frontend) -- (ws);
+  \draw[->] (ws) -- (backend);
+  \draw[->] (backend) -- (agents);
+  \draw[<->] (backend) -- (store);
+\end{tikzpicture}
+\end{center}
+
+\subsection{后端模块结构}
+
+后端采用模块化设计：
+
+\begin{lstlisting}[language=bash]
+backend/dionysus_server/
+|-- main.py                 # FastAPI 入口与路由
+|-- config.py               # DionysusConfig 配置
+|-- models.py               # Pydantic 消息模型
+|-- theme_manager.py        # 主题 CRUD
+|-- session/
+|   |-- manager.py          # 会话/适配器/Supervisor 编排
+|   |-- store.py            # SQLite 持久化
+|   |-- models.py           # Session / Message 模型
+|-- websocket/
+|   |-- connection.py       # WebSocket 连接管理
+|   |-- handler.py          # 消息路由
+|-- persona/
+|   |-- loader.py           # YAML 角色加载
+|   |-- companion_engine.py # 事件驱动的角色反应
+|   |-- companion_scheduler.py
+|   |-- supervisor.py       # CompanionSupervisor
+|   |-- todo_tracker.py     # 工具调用跟踪
+|-- agent\_adapters/
+    |-- base.py             # 适配器接口
+    |-- registry.py         # 适配器注册表
+    |-- generic\_cli.py      # 通用 CLI 适配器
+    |-- kimi\_code\_cli.py   # Kimi CLI 适配
+    |-- strategies/         # 各 Agent 输出解析策略
+\end{lstlisting}
+
+\subsection{前端模块结构}
+
+\begin{lstlisting}[language=bash]
+frontend/src/
+|-- App.tsx                 # 应用根组件，WebSocket 消息分发
+|-- main.tsx                # React 渲染入口
+|-- types/protocol.ts       # 前后端协议类型
+|-- lib/
+|   |-- theme.ts            # 主题应用工具
+|   |-- tools.ts            # 工具块解析
+|-- stores/
+|   |-- chatStore.ts        # 会话/消息状态
+|   |-- live2dStore.ts      # Live2D 状态
+|   |-- themeStore.ts       # 主题状态
+|   |-- settingsStore.ts    # 系统设置
+|   |-- adapterStore.ts     # Agent 适配器状态
+|-- components/
+|   |-- Layout/             # 布局组件
+|   |-- Pages/              # 页面级组件
+|   |-- Chat/               # 聊天消息相关
+|   |-- Live2D/             # Live2D 渲染
+|   |-- Character/          # 角色对话框
+|   |-- Tools/              # 工具面板
+|   |-- UI/                 # 通用 UI 组件
+|-- hooks/                  # 自定义 Hooks
+|-- services/               # WebSocket 封装
+\end{lstlisting}
+
+% ============================================================
+\section{前端设计系统}
+% ============================================================
+
+前端采用 \textbf{CSS 变量 + TailwindCSS} 两层设计体系：底层是全局设计 token，上层是原子化工具类与共享组件类。
+
+\subsection{设计 Token 文件}
+
+\begin{longtable}{p{5.5cm}p{7cm}}
+\toprule
+\textbf{文件} & \textbf{说明} \\
+\midrule
+\endhead
+\path{frontend/src/styles/variables.css} & 全局 CSS 变量：颜色、字体、玻璃拟态、阴影、暗黑/亮色主题、字号等 \\
+\path{frontend/tailwind.config.js} & 把 CSS 变量映射为 \texttt{dionysus-*} Tailwind 颜色/字体名 \\
+\path{frontend/src/styles/index.css} & 共享样式类：\texttt{.cel-panel}、\texttt{.cel-button}、\texttt{.cel-bubble-*} 等 \\
+\bottomrule
+\end{longtable}
+
+\subsection{常用 Token 示例}
+
+\begin{lstlisting}[language=css]
+:root {
+  --dionysus-primary: #38bdf8;
+  --dionysus-background: #0b0c10;
+  --dionysus-text-primary: #f5f5f7;
+  --dionysus-glass-bg: rgba(255, 255, 255, 0.04);
+  --dionysus-glass-border: rgba(255, 255, 255, 0.08);
+  --dionysus-glow: 0 0 0 1px rgba(56, 189, 248, 0.15),
+                    0 8px 32px rgba(0, 0, 0, 0.45);
+}
+\end{lstlisting}
+
+\subsection{组件目录速查}
+
+\begin{longtable}{p{5cm}p{7.5cm}}
+\toprule
+\textbf{目录} & \textbf{负责内容} \\
+\midrule
+\endhead
+\path{components/Pages/} & 页面/覆盖层：调色盘、角色、系统设置、覆盖层容器 \\
+\path{components/Layout/} & 整体布局：侧边栏、会话列表、顶部栏、右侧 Companion 区 \\
+\path{components/Chat/} & 聊天消息、流式输出、思考中状态 \\
+\path{components/Input/} & 底部输入框、快捷操作栏 \\
+\path{components/Live2D/} & Live2D 渲染器 \\
+\path{components/Character/} & 角色对话框 \\
+\path{components/Tools/} & 工具面板、HUD \\
+\path{components/Options/} & 选项按钮组、下拉框 \\
+\path{components/UI/} & 通用基础组件 \\
+\bottomrule
+\end{longtable}
+
+\subsection{调整组件外观的建议}
+
+\begin{enumerate}[leftmargin=2em]
+  \item 改「整体颜色/主题」：编辑 \texttt{variables.css}，同步检查 \texttt{tailwind.config.js}。
+  \item 改「通用面板/按钮/气泡风格」：编辑 \texttt{index.css} 中的 \texttt{.cel-*} 类。
+  \item 改「单个组件布局」：直接修改对应 \texttt{.tsx} 文件里的 \texttt{className}，优先使用已有的 \texttt{dionysus-*} token。
+  \item 新增主题模式：在 \texttt{variables.css} 中新增 \texttt{[data-theme-mode="xxx"]} 属性选择器，并在主题切换逻辑里注册该模式。
+\end{enumerate}
+
+% ============================================================
+\section{核心数据流}
+% ============================================================
+
+\subsection{一次用户提问的完整流程}
+
+\begin{enumerate}[leftmargin=2em]
+  \item 用户在前端输入框发送消息。
+  \item 前端通过 WebSocket 发送 \texttt{user\_input} 消息。
+  \item \texttt{MessageHandler} 路由到 \texttt{SessionManager.handle\_user\_input}。
+  \item 保存用户消息到 SQLite，更新会话状态为 \texttt{PROCESSING}。
+  \item 如果是首次对话，注入角色 system\_prompt 到适配器。
+  \item 调用对应适配器的 \texttt{send} 方法，启动子进程执行 CLI Agent。
+  \item 适配器把 stdout/stderr 解析为 \texttt{AgentEvent}。
+  \item \texttt{SessionManager} 把事件转换为 \texttt{ServerMessage} 并通过 WebSocket 广播。
+  \item 前端 \texttt{App.tsx} 收到消息，更新 \texttt{chatStore}，渲染流式文本 / 状态 / 工具。
+  \item 同时 \texttt{CompanionEngine} 根据事件生成角色反应（台词、表情、动作）。
+  \item Agent 完成后，保存 assistant 消息，更新状态为 \texttt{IDLE} 或 \texttt{ERROR}。
+  \item \texttt{CompanionScheduler} 在状态变化时触发全局角色反应。
+\end{enumerate}
+
+\subsection{角色切换流程}
+
+\begin{enumerate}[leftmargin=2em]
+  \item 用户在角色页选择新角色。
+  \item 前端发送 \texttt{client\_command}，命令为 \texttt{switch\_persona}。
+  \item 后端修改会话的 \texttt{persona\_id} 并持久化。
+  \item 前端 \texttt{PersonaPage} 重新加载该角色的语料和 Live2D 路径。
+  \item 右侧 \texttt{Live2DViewer} 触发模型重载。
+\end{enumerate}
+
+\subsection{Supervisor 工作流}
+
+\begin{enumerate}[leftmargin=2em]
+  \item 后端启动时，\texttt{SessionManager.init} 创建 \texttt{CompanionSupervisor} 并启动。
+  \item Supervisor 按配置间隔轮询当前所有会话。
+  \item 根据模式不同：
+  \begin{itemize}
+    \item disabled：直接跳过；
+    \item agent\_session：用独立适配器处理上下文，生成播报；
+    \item deepseek\_api：调用 DeepSeek API 生成播报。
+  \end{itemize}
+  \item 生成的 Companion 消息通过 \texttt{broadcast\_callback} 推送给前端。
+  \item 前端把消息显示在角色对话框，并触发表情/动作。
+\end{enumerate}
+
+% ============================================================
+\section{核心模块说明}
+% ============================================================
+
+\subsection{SessionManager}
+
+\texttt{SessionManager} 是后端的中央调度器，职责包括：
+
+\begin{itemize}[leftmargin=2em]
+  \item 会话生命周期管理（创建、读取、删除、列表）。
+  \item 适配器生命周期管理（创建、启动、关闭、切换）。
+  \item 用户输入、选项选择、中断、客户端命令的处理。
+  \item 角色 system\_prompt 注入。
+  \item 调用 CompanionEngine 和 TodoTracker 生成角色反应与工具状态。
+  \item 管理 CompanionSupervisor。
+\end{itemize}
+
+\subsection{IAgentAdapter / GenericCLIAdapter}
+
+\texttt{IAgentAdapter} 定义了适配器接口：
+
+\begin{lstlisting}[language=python]
+class IAgentAdapter(ABC):
+    @abstractmethod
+    async def start(self) -> None: ...
+    @abstractmethod
+    async def shutdown(self) -> None: ...
+    @abstractmethod
+    async def send(self, input: AgentInput) -> AsyncIterator[AgentEvent]: ...
+    @abstractmethod
+    async def inject_system_prompt(self, prompt: str, context_vars: dict) -> None: ...
+    @abstractmethod
+    async def interrupt(self) -> None: ...
+\end{lstlisting}
+
+\texttt{GenericCLIAdapter} 是通用实现，通过子进程调用 CLI Agent，并使用 strategy 解析不同 Agent 的输出格式。
+
+\subsection{Persona YAML 结构}
+
+\begin{lstlisting}[language=yaml]
+id: exusiai
+name: 能天使
+description: 企鹅物流的信使，拉特兰出身的萨科塔，爱吃苹果派
+system_prompt: |
+  你是能天使...
+tone_rules:
+  prefix_templates: [...]
+  suffix_templates: [...]
+emotion_mapping:
+  开心: { expression: happy, motion: nod_once, sticker_pool: [...] }
+companion:
+  live2d:
+    model_path: /personas/live2d/exusiai/00.model3.json
+    default_expression: 原皮
+    expressions: { happy: 微笑, ... }
+    motions: { idle: Idle, ... }
+  touch_zones:
+    head: { expression: 惊讶, lines: [...] }
+  status_to_emotion:
+    thinking: neutral
+    executing: confident
+    error: worried
+\end{lstlisting}
+
+\subsection{CompanionEngine}
+
+\texttt{CompanionEngine} 根据 Agent 事件生成角色反应。它会：
+
+\begin{itemize}[leftmargin=2em]
+  \item 识别事件类型（stream、status\_update、complete 等）。
+  \item 结合角色 emotion\_mapping 和语料生成台词。
+  \item 返回 \texttt{CompanionReaction}（文本、情绪、表情、动作、贴纸）。
+\end{itemize}
+
+\subsection{Live2DViewer}
+
+前端 \texttt{Live2DViewer} 基于 Pixi.js 和 pixi-live2d-display：
+
+\begin{itemize}[leftmargin=2em]
+  \item 从 \texttt{live2dStore} 读取当前角色和模型路径。
+  \item 加载模型后设置默认表情/动作。
+  \item 监听鼠标位置实现视线跟踪。
+  \item 响应 \texttt{emotion\_update} 和 \texttt{live2d\_action} 消息切换表情动作。
+\end{itemize}
+
+% ============================================================
+\section{开发指南}
+% ============================================================
+
+\subsection{环境搭建}
+
+\begin{lstlisting}[language=bash]
+# 后端
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+
+# 前端
+cd frontend
+npm install
+\end{lstlisting}
+
+\subsection{如何添加新角色}
+
+\begin{enumerate}[leftmargin=2em]
+  \item 通过界面「添加角色」表单创建，或在 \texttt{backend/config/personas/} 下新建 YAML。
+  \item 编写 system\_prompt 和语料文件。
+  \item 可选：准备 Live2D 模型文件夹并上传。
+  \item 在 emotion\_mapping 中定义情绪到表情/动作的映射。
+\end{enumerate}
+
+\subsection{如何添加新的 Agent 适配器}
+
+\begin{enumerate}[leftmargin=2em]
+  \item 在 \texttt{agent\_adapters/strategies/} 下新增解析策略（如 \texttt{myagent.py}）。
+  \item 在 \texttt{config.py} 或运行时配置中添加 adapter 条目。
+  \item 在 \texttt{SystemSettingsPage} 中确认新适配器会显示。
+  \item 后端 \texttt{AdapterRegistry} 会自动根据配置创建 \texttt{GenericCLIAdapter} 实例。
+\end{enumerate}
+
+\subsection{如何扩展 WebSocket 消息}
+
+\begin{enumerate}[leftmargin=2em]
+  \item 在 \texttt{models.py} 中新增消息模型。
+  \item 在 \texttt{MessageHandler.handle} 中增加路由分支。
+  \item 在 \texttt{types/protocol.ts} 和 \texttt{App.tsx} 中增加前端处理逻辑。
+\end{enumerate}
+
+\subsection{测试与质量保障}
+
+项目包含前端、后端和端到端三层测试：
+
+\begin{longtable}{p{3.5cm}p{3.5cm}p{6cm}}
+\toprule
+\textbf{层级} & \textbf{命令} & \textbf{说明} \\
+\midrule
+\endhead
+后端单元测试 & \texttt{pytest -q} & 32 passed，覆盖会话、适配器、角色、配置等 \\
+前端单元测试 & \texttt{npm run test -- --run} & 5 passed，覆盖关键 React 组件 \\
+前端构建 & \texttt{npm run build} & 验证生产构建能否成功 \\
+端到端测试 & 见 \path{docs/novice_test_log.md} & 模拟新手用户按用户指南逐项操作并截图 \\
+\bottomrule
+\end{longtable}
+
+\subsection{新手用户端到端测试摘要}
+
+2026-06-24 完成了一次以「完全未接触过 Dionysus 的新手用户」视角的端到端测试，测试覆盖首次访问、发送消息、切换主题、切换角色、系统设置、配对二维码、会话管理等 8 个步骤。
+
+测试发现并修复了 3 个主要可用性问题：
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{全局覆盖页缺少关闭按钮}：为 \texttt{OverlayPage} 增加标题栏关闭按钮，并支持 Escape 键关闭。
+  \item \textbf{配对二维码入口不可见}：修正 \texttt{QRCodeButton} 为 \texttt{/api/pair/qr}，并补全按钮辅助属性。
+  \item \textbf{会话缺少可见的删除/重命名入口}：为 \texttt{SessionList} 增加「更多」操作菜单；菜单支持点击外部、Escape 关闭，删除后自动收起。
+\end{enumerate}
+
+此外，系统设置页的「清除本地缓存」增加了 \texttt{window.confirm} 二次确认，避免误操作导致会话丢失。详细记录与截图见 \path{docs/novice_test_log.md} 和 \path{docs/novice_test_log.pdf}。
+
+% ============================================================
+\section{配置说明}
+% ============================================================
+
+\subsection{后端配置}
+
+后端配置通过 Pydantic Settings 加载，优先级：环境变量 > \texttt{.env} 文件 > 默认值。关键配置项：
+
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{DIONYSUS\_CONFIG\_DIR}：配置目录，默认 \texttt{backend/config}。
+  \item \texttt{DIONYSUS\_DATA\_DIR}：数据目录，默认 \texttt{backend/data}。
+  \item \texttt{DEEPSEEK\_API\_KEY}：DeepSeek API Key，用于 Supervisor deepseek\_api 模式。
+\end{itemize}
+
+\subsection{前端配置}
+
+前端使用 Vite 环境变量：
+
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{VITE\_API\_URL}：后端 API 地址，开发模式下默认代理到 \texttt{/api}。
+  \item \texttt{VITE\_WS\_URL}：WebSocket 地址。
+\end{itemize}
+
+% ============================================================
+\section{部署说明}
+% ============================================================
+
+\subsection{开发模式}
+
+\begin{lstlisting}[language=bash]
+# 终端 1
+cd backend && source .venv/bin/activate && uvicorn dionysus_server.main:app --host 0.0.0.0 --port 8765
+
+# 终端 2
+cd frontend && npm run dev
+\end{lstlisting}
+
+\subsection{生产构建}
+
+\begin{lstlisting}[language=bash]
+cd frontend
+npm run build
+# 构建产物在 dist/，可通过任意静态服务器托管
+\end{lstlisting}
+
+\subsection{Electron 桌面版}
+
+\begin{lstlisting}[language=bash]
+cd frontend
+npm run electron:build
+# 输出在 release/，支持 macOS dmg/zip
+\end{lstlisting}
+
+% ============================================================
+\section{REST API 速查}
+% ============================================================
+
+\begin{longtable}{p{5.5cm}p{2.5cm}p{5.5cm}}
+\toprule
+\textbf{端点} & \textbf{方法} & \textbf{说明} \\
+\midrule
+\endhead
+\texttt{/api/personas} & GET & 列出所有角色 \\
+\texttt{/api/personas} & POST & 从 YAML 创建角色 \\
+\texttt{/api/personas/create} & POST & 从 JSON 表单创建角色 \\
+\texttt{/api/personas/\{id\}} & GET & 获取角色详情 \\
+\texttt{/api/personas/\{id\}} & POST & 保存角色 YAML \\
+\texttt{/api/personas/\{id\}/corpus} & GET & 获取语料文本 \\
+\texttt{/api/personas/\{id\}/corpus} & POST & 保存/上传语料 \\
+\texttt{/api/personas/\{id\}/live2d} & POST & 上传 Live2D 模型 \\
+\texttt{/api/personas/\{id\}/live2d} & DELETE & 解绑 Live2D 模型 \\
+\texttt{/api/settings/supervisor} & GET & 获取 Supervisor 配置 \\
+\texttt{/api/settings/supervisor} & POST & 保存 Supervisor 配置 \\
+\texttt{/api/adapters} & GET & 列出 Agent 适配器 \\
+\texttt{/api/settings/agents} & GET/POST & Agent 适配器配置 \\
+\texttt{/api/pair/qr} & GET & 移动端配对二维码（URL 由后端根据请求自动生成） \\
+\texttt{/api/server/qr} & GET & 旧版通用二维码，带 \texttt{url} 查询参数，建议迁移到 \texttt{/api/pair/qr} \\
+\texttt{/ws} & WebSocket & 实时消息通道 \\
+\bottomrule
+\end{longtable}
+
+% ============================================================
+\section{故障排查}
+% ============================================================
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{前端无法连接后端}：检查后端是否启动、CORS/代理配置是否正确。
+  \item \textbf{角色列表为空}：检查 \texttt{backend/config/personas/} 下是否存在 YAML 文件。
+  \item \textbf{Live2D 模型不显示}：确认 \texttt{.model3.json} 存在且资源文件路径正确；查看浏览器控制台网络请求。
+  \item \textbf{Agent 无响应}：确认适配器命令在 PATH 中；查看后端日志中适配器启动错误。
+  \item \textbf{Supervisor 不播报}：检查模式、Adapter ID / API Key、扫描间隔；查看后端日志。
+\end{itemize}
+
+% ============================================================
+\section{路线图}
+% ============================================================
+
+\begin{itemize}[leftmargin=2em]
+  \item 更多内置角色与角色市场。
+  \item 语音合成（TTS）让角色开口说话。
+  \item 更丰富的 Live2D 触摸互动。
+  \item 插件系统，支持第三方工具扩展。
+  \item 云端同步角色与设置。
+\end{itemize}
+
+\end{document}
