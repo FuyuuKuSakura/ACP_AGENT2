@@ -23,7 +23,7 @@ Dionysus 是一个 **VS Code 插件**，把多个 AI 编程助手 CLI（Kimi Cod
 从 Releases 下载 `.vsix`（或自行打包，见「开发指南」），然后：
 
 ```bash
-code --install-extension dionysus-vscode-0.1.0.vsix
+code --install-extension dionysus-vscode-0.3.0.vsix
 ```
 
 或在 VS Code 内：`扩展` 面板右上角 `...` → `从 VSIX 安装...`。
@@ -104,7 +104,7 @@ packages/
 ├── webview/       # @dionysus/webview —— 插件内 React 应用（聊天 + Live2D）
 └── mobile/        # @dionysus/mobile —— 手机端 React 应用（仿 QQ IA）
 assets/            # 出厂角色素材（Live2D 模型、persona YAML）
-legacy/            # v2 旧实现（只读存档）
+legacy/            # v2 旧实现，已于 v0.3.0 发布前移除（需查阅请从 git 历史获取）
 docs/v3/           # v3 架构文档与开发计划
 ```
 
@@ -115,7 +115,7 @@ docs/v3/           # v3 架构文档与开发计划
 ```bash
 npm install          # 安装全部依赖
 npm run build        # 构建全部包
-npm test             # 全部单测（612 用例）
+npm test             # 全部单测（686 用例）
 npm run lint         # eslint
 npm run typecheck    # tsc --noEmit
 
@@ -136,6 +136,6 @@ cd packages/core && npm run demo:kimi
 ## 许可
 
 - 出厂角色素材（kal'tsit Live2D 模型与 persona 配置）随包分发，**版权已经确认无问题**。
-- 代码许可证：**LICENSE 文件待发布前落实（占位）**——发布前请补入 LICENSE 文本并同步更新本说明。
+- 代码许可证：MIT（详见仓库根目录 LICENSE）。
 
 架构与开发计划详见 `docs/v3/`（`architecture.md` / `roadmap.md`）。
