@@ -1,6 +1,6 @@
 {
   "name": "@dionysus/mobile",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Mobile web client (phone browser over LAN): QQ-style session list + chat + companion drawer",
   "type": "module",
@@ -12,8 +12,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@dionysus/client-core": "^0.1.0",
-    "@dionysus/protocol": "^0.1.0",
+    "@dionysus/client-core": "^0.3.0",
+    "@dionysus/protocol": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.5.5"

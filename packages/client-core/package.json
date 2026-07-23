@@ -1,6 +1,6 @@
 {
   "name": "@dionysus/client-core",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "ClientTransport / messageRouter / per-domain stores / shared UI primitives (webview + mobile)",
   "type": "module",
@@ -22,7 +22,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@dionysus/protocol": "^0.1.0",
+    "@dionysus/protocol": "^0.3.0",
     "zustand": "^4.5.5"
   },
   "devDependencies": {

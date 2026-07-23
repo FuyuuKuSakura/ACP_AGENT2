@@ -2,7 +2,7 @@
 
 本文件遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 格式。
 
-## [3.0.0] - 2026-07-22
+## [0.3.0] - 2026-07-22
 
 Dionysus v3 首个版本：从 v2 的 Electron + Python 后端架构全面重写为 **VS Code 插件 + 手机端浏览器** 形态（TypeScript monorepo，零 Python 依赖）。
 

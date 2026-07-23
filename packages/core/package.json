@@ -1,6 +1,6 @@
 {
   "name": "@dionysus/core",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Host-agnostic business core: adapters / session / persona (zero vscode, zero HTTP/WS deps)",
   "type": "module",
@@ -23,7 +23,7 @@
     "demo:kimi": "tsx scripts/demo-kimi.ts"
   },
   "dependencies": {
-    "@dionysus/protocol": "^0.1.0",
+    "@dionysus/protocol": "^0.3.0",
     "yaml": "^2.9.0",
     "zod": "^3.25.76"
   },

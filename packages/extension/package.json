@@ -1,7 +1,7 @@
 {
   "name": "dionysus-vscode",
   "displayName": "Dionysus - AI 助手陪伴",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "AI 编程助手统一客户端：多 CLI（Kimi Code / Claude Code / Codex / OpenCode / CodeBuddy）并行管理、Live2D 角色陪伴与进度汇报、手机扫码随时掌控进展。",
   "publisher": "dionysus",
@@ -294,9 +294,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@dionysus/client-core": "^0.1.0",
-    "@dionysus/core": "^0.1.0",
-    "@dionysus/protocol": "^0.1.0",
+    "@dionysus/client-core": "^0.3.0",
+    "@dionysus/core": "^0.3.0",
+    "@dionysus/protocol": "^0.3.0",
     "qrcode": "^1.5.4",
     "ws": "^8.18.0",
     "yaml": "^2.9.0"

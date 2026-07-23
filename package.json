@@ -1,6 +1,6 @@
 {
   "name": "dionysus",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Dionysus v3 — VS Code extension + mobile client (TypeScript monorepo)",
   "workspaces": [

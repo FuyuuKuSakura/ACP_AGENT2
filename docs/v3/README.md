@@ -38,18 +38,8 @@ v3 设计文档的六视角审阅，共 54 条发现；修订以各报告「修�
 
 ## 状态
 
-- 旧代码（`backend/`、`frontend/`、`electron/` 等）已于 2026-07 移入 `legacy/` 原样保留，仅作提取文档的参考来源（见文末「legacy 路径映射」）。
+- 旧代码（`backend/`、`frontend/`、`electron/` 等）曾迁入 `legacy/` 保留，已于发布 0.3.0 前整体删除——extract/ 文档中引用的 v2 路径均为历史位置，需要查阅时从 git 历史获取（删除前最后一个包含 `legacy/` 的提交为 `e7f982a`）。
 - `../dionysus_fullstack.agent.final.md` 为 v2.0 设计稿（2025-07-12），已被 v3 架构取代，仅具历史/概念参考价值。
-
-## legacy 路径映射
-
-2026-07 迁移后，extract/ 文档中引用的 v2 路径对应 `legacy/` 下的同路径（extract/ 文档正文未逐处改写，阅读时按本节映射）：
-
-- `backend/...` → `legacy/backend/...`（含 `backend/config/server.yaml`、`backend/config/themes`，后者按 ADR-20 不迁移进 v3）
-- `frontend/...` → `legacy/frontend/...`
-- `electron/...` → `legacy/electron/...`
-- `scripts/...` → `legacy/scripts/...`
-- `docs/` 旧文档（handbook、user_guide、review 报告等）→ `legacy/docs/...`
 - 设计稿图片（`设计稿-主界面区.png`、`设计草稿1.png`、`测试壁纸.JPG`）→ `legacy/docs/design/`
 - `kal'tsit_live2d/` → `assets/live2d/kal'tsit/`；`exusiai_live2d/` → `assets/live2d/exusiai/`
 - `backend/config/personas/` → `assets/personas/`（runtime YAML 已与 builtin 版按键合并补全）
