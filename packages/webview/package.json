@@ -1,0 +1,37 @@
+{
+  "name": "@dionysus/webview",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React 18 application running inside the VS Code webview (chat + Live2D companion)",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@dionysus/client-core": "^0.1.0",
+    "@dionysus/protocol": "^0.1.0",
+    "@pixi/unsafe-eval": "^7.4.3",
+    "pixi-live2d-display": "^0.5.0-beta",
+    "pixi.js": "^7.4.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^14.3.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "^10.5.4",
+    "jsdom": "^24.1.3",
+    "postcss": "^8.5.20",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.4.5",
+    "vite": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}

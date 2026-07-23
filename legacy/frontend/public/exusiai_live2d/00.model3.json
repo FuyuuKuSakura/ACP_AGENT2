@@ -1,0 +1,131 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "00.moc3",
+		"Textures": [
+			"00.4096/texture_00.png"
+		],
+		"Physics": "00.physics3.json",
+		"DisplayInfo": "00.cdi3.json",
+		"Expressions": [
+			{
+				"Name": "o.o",
+				"File": "expressions/o.o.exp3.json"
+			},
+			{
+				"Name": "举起手",
+				"File": "expressions/举起手.exp3.json"
+			},
+			{
+				"Name": "光环",
+				"File": "expressions/光环.exp3.json"
+			},
+			{
+				"Name": "光环亮灯",
+				"File": "expressions/光环亮灯.exp3.json"
+			},
+			{
+				"Name": "光环跑马灯",
+				"File": "expressions/光环跑马灯.exp3.json"
+			},
+			{
+				"Name": "兔女郎",
+				"File": "expressions/兔女郎.exp3.json"
+			},
+			{
+				"Name": "出魂",
+				"File": "expressions/出魂.exp3.json"
+			},
+			{
+				"Name": "原皮",
+				"File": "expressions/原皮.exp3.json"
+			},
+			{
+				"Name": "吐血",
+				"File": "expressions/吐血.exp3.json"
+			},
+			{
+				"Name": "哭哭",
+				"File": "expressions/哭哭.exp3.json"
+			},
+			{
+				"Name": "喂我花生",
+				"File": "expressions/喂我花生.exp3.json"
+			},
+			{
+				"Name": "天使翅膀",
+				"File": "expressions/天使翅膀.exp3.json"
+			},
+			{
+				"Name": "恶魔翅膀",
+				"File": "expressions/恶魔翅膀.exp3.json"
+			},
+			{
+				"Name": "手机发光",
+				"File": "expressions/手机发光.exp3.json"
+			},
+			{
+				"Name": "拿手机",
+				"File": "expressions/拿手机.exp3.json"
+			},
+			{
+				"Name": "持花",
+				"File": "expressions/持花.exp3.json"
+			},
+			{
+				"Name": "爱心眼",
+				"File": "expressions/爱心眼.exp3.json"
+			},
+			{
+				"Name": "白旗",
+				"File": "expressions/白旗.exp3.json"
+			},
+			{
+				"Name": "白裙",
+				"File": "expressions/白裙.exp3.json"
+			},
+			{
+				"Name": "胸前手",
+				"File": "expressions/胸前手.exp3.json"
+			},
+			{
+				"Name": "脸红",
+				"File": "expressions/脸红.exp3.json"
+			},
+			{
+				"Name": "西装",
+				"File": "expressions/西装.exp3.json"
+			},
+			{
+				"Name": "饭碗",
+				"File": "expressions/饭碗.exp3.json"
+			},
+			{
+				"Name": "？",
+				"File": "expressions/？.exp3.json"
+			}
+		],
+		"Motions": {
+			"Idle": [
+				{
+					"File": "motions/idle.motion3.json"
+				}
+			]
+		}
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	]
+}

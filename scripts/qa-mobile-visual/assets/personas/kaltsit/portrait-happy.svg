@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" width="600" height="900">
+  <defs>
+    <linearGradient id="hairH" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef4ef"/>
+      <stop offset="1" stop-color="#b9d2c5"/>
+    </linearGradient>
+    <linearGradient id="coatH" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6f8f6"/>
+      <stop offset="1" stop-color="#dbe3de"/>
+    </linearGradient>
+  </defs>
+  <!-- 猫耳（竖起） -->
+  <path d="M212 180 L228 50 L302 132 Z" fill="url(#hairH)" stroke="#8fa89c" stroke-width="6"/>
+  <path d="M388 180 L372 50 L298 132 Z" fill="url(#hairH)" stroke="#8fa89c" stroke-width="6"/>
+  <path d="M234 152 L243 92 L282 130 Z" fill="#d3aaaa"/>
+  <path d="M366 152 L357 92 L318 130 Z" fill="#d3aaaa"/>
+  <!-- 长发 -->
+  <path d="M190 260 Q170 140 300 130 Q430 140 410 260 L430 560 Q360 610 300 610 Q240 610 170 560 Z" fill="url(#hairH)"/>
+  <!-- 脸 -->
+  <ellipse cx="300" cy="280" rx="95" ry="88" fill="#f8e8dc"/>
+  <!-- 腮红 -->
+  <ellipse cx="238" cy="318" rx="16" ry="9" fill="#f0b8a8" opacity="0.7"/>
+  <ellipse cx="362" cy="318" rx="16" ry="9" fill="#f0b8a8" opacity="0.7"/>
+  <!-- 刘海 -->
+  <path d="M205 260 Q215 170 300 165 Q385 170 395 260 Q350 205 330 230 Q318 190 300 190 Q282 190 270 230 Q250 205 205 260 Z" fill="url(#hairH)"/>
+  <!-- 眼（笑眼弯月） -->
+  <path d="M240 292 Q258 272 276 292" stroke="#2f6b52" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M324 292 Q342 272 360 292" stroke="#2f6b52" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- 嘴（笑） -->
+  <path d="M282 326 Q300 344 318 326" stroke="#c98f7a" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- 身体 -->
+  <path d="M215 420 Q300 380 385 420 L430 880 L170 880 Z" fill="url(#coatH)" stroke="#b9c6bf" stroke-width="4"/>
+  <path d="M275 415 L300 470 L325 415 L340 430 L312 880 L288 880 L260 430 Z" fill="#52836f"/>
+  <!-- 挥手 -->
+  <path d="M400 460 Q460 420 480 360" stroke="#f8e8dc" stroke-width="24" fill="none" stroke-linecap="round"/>
+  <circle cx="484" cy="350" r="18" fill="#f8e8dc"/>
+  <!-- 前发 -->
+  <path d="M205 250 Q190 380 215 470 Q228 380 232 300 Z" fill="url(#hairH)"/>
+  <path d="M395 250 Q410 380 385 470 Q372 380 368 300 Z" fill="url(#hairH)"/>
+</svg>

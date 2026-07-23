@@ -1,0 +1,16 @@
+# opencode stream-json fixture
+# 来源：按 docs/v3/extract/adapters.md §5.4 的行样例重建（extract 原文注明样例本身
+# 即"根据解析逻辑重建"，非真实录制）。为遵守"不发任何有副作用的 prompt"的约束，
+# 本 fixture 未对真实 opencode CLI 录制。覆盖：sessionID 键名捕获（兼容
+# session_id/session/sessionID 三种）/ message（content 取值链）/ text
+# （嵌套 part.text，`opencode run --format json` 实际发出的形状）/ tool_call /
+# result 结果信封 / 纯裸文本行。
+# R-7：extract 映射表中无 opencode 的 tool_result 行，本 fixture 同样不含——
+# 策略只产 tool_call；待真实 CLI 录制验证后补充（architecture.md §5.2）。
+{"type":"step_start","sessionID":"oc-sess-1"}
+{"type":"message","content":"hello"}
+{"type":"text","part":{"text":"部分文本"}}
+{"type":"tool_call","name":"edit","arguments":"{\"path\":\"a.ts\"}"}
+{"type":"step_finish"}
+{"type":"result","result":"done"}
+opencode stderr noise line

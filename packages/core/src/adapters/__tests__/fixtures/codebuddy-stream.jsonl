@@ -1,0 +1,15 @@
+# codebuddy stream-json fixture
+# 来源：翻译 legacy/backend/tests/test_codebuddy_strategy.py 的真实 fixture（v2 唯一
+# 有真实测试 fixture 的策略，extract/adapters.md §5.5），并补一条成功 result 收尾行
+# （同文件 test_result_success_is_silent 用例的形状）。未对真实 codebuddy CLI 发 prompt。
+# 覆盖：system/init（session_id 捕获）/ system/status / file-history-snapshot /
+# assistant thinking / assistant text / assistant tool_use / assistant tool_result /
+# result 成功（静默）。
+{"type":"system","subtype":"init","session_id":"abc"}
+{"type":"system","subtype":"status"}
+{"type":"file-history-snapshot","files":[]}
+{"type":"assistant","message":{"content":[{"type":"thinking","thinking":"step 1"}]}}
+{"type":"assistant","message":{"content":[{"type":"text","text":"Hi"}]}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"read","input":{"path":"x"}}]}}
+{"type":"assistant","message":{"content":[{"type":"tool_result","content":"done"}]}}
+{"type":"result","is_error":false,"result":"ok","session_id":"abc"}

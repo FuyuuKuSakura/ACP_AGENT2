@@ -1,0 +1,33 @@
+{
+  "name": "@dionysus/client-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ClientTransport / messageRouter / per-domain stores / shared UI primitives (webview + mobile)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@dionysus/protocol": "^0.1.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3",
+    "typescript": "~5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

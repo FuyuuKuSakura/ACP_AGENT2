@@ -1,0 +1,46 @@
+/* sidebar 会话列表：状态点五态颜色映射（ux-core-flows.md §2.2）与呼吸动画。
+   色值一律走 theme/vscode.css 的 --dn-* token（design-principles.md §6 V1/V2），
+   不写死 hex；脱离 VS Code 环境时由 token 层内的 var(--vscode-*) 链兜底。 */
+
+.dio-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex: none;
+}
+
+/* idle：灰 */
+.dio-dot-idle {
+  background: var(--dn-muted);
+}
+
+/* running：金色呼吸 */
+.dio-dot-running {
+  background: var(--dn-running);
+  animation: dio-dot-breathe 1.6s ease-in-out infinite;
+}
+
+/* waiting_option：警示色（与聚合条/OptionGroup 同一 --dn-attention 来源） */
+.dio-dot-waiting_option {
+  background: var(--dn-attention);
+}
+
+/* error：红 */
+.dio-dot-error {
+  background: var(--dn-error);
+}
+
+/* done：绿 */
+.dio-dot-done {
+  background: var(--dn-success);
+}
+
+@keyframes dio-dot-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}

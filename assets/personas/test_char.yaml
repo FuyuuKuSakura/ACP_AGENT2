@@ -1,0 +1,52 @@
+id: test_char
+name: 测试角色
+description: 一个测试角色
+system_prompt: '你是测试角色。
+
+
+  称呼：你称用户为"用户"。自称用"我"。
+
+
+  回复风格：
+
+  - 用自然、口语化的中文回复。
+
+  - 不要解释设定，直接以测试角色的身份回答。
+
+  '
+companion:
+  live2d:
+    model_path: ''
+    default_expression: 原皮
+    expressions:
+      happy: 微笑
+      worried: 叹气
+      surprised: 惊讶
+      annoyed: 烦躁
+      confident: 冷静
+      bored: 原皮
+      neutral: 原皮
+    motions:
+      idle: Idle
+      greet: Idle
+      nod: Idle
+  touch_zones:
+    head:
+      expression: 惊讶
+      lines:
+      - 嗯？
+      - 怎么啦？
+    body:
+      expression: 烦躁
+      lines:
+      - 请轻一点。
+      - 这样有点痒。
+  status_to_emotion:
+    thinking: neutral
+    reading_file: neutral
+    executing: confident
+    outputting: calm
+    success: calm
+    error: worried
+    idle: bored
+    long_workflow: bored

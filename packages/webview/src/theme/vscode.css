@@ -1,0 +1,143 @@
+/**
+ * VS Code 主题适配层（architecture.md §7「--vscode-* → token 映射」）。
+ *
+ * 所有语义 token（--dn-*）一律引用 var(--vscode-*)，不写死任何色值；
+ * 组件只消费 --dn-* token（Tailwind arbitrary value，如 bg-[var(--dn-bg)]），
+ * VS Code 浅/深/高对比主题切换时由宿主自动刷新 --vscode-* 变量。
+ *
+ * token 角色对照 extract/design-style.md §1.2 的 dionysus 色板：
+ *   userBubble      → --dn-user-bubble-*
+ *   agentBubble     → --dn-agent-bubble-bg
+ *   primary/accent  → --dn-accent（edit 类工具卡主色描边）
+ *   danger/success  → --dn-error / --dn-success
+ */
+:root {
+  /* 基底 */
+  --dn-bg: var(--vscode-editor-background);
+  --dn-fg: var(--vscode-editor-foreground, var(--vscode-foreground));
+  --dn-panel-bg: var(
+    --vscode-sideBar-background,
+    var(--vscode-editor-background)
+  );
+  --dn-border: var(--vscode-panel-border, var(--vscode-widget-border));
+  --dn-muted: var(--vscode-descriptionForeground, var(--vscode-foreground));
+
+  /* 气泡 */
+  --dn-user-bubble-bg: var(--vscode-button-background);
+  --dn-user-bubble-fg: var(--vscode-button-foreground);
+  --dn-agent-bubble-bg: var(
+    --vscode-editorWidget-background,
+    var(--vscode-sideBar-background)
+  );
+  --dn-system-fg: var(--vscode-descriptionForeground, var(--vscode-foreground));
+
+  /* 强调 / 状态 */
+  --dn-accent: var(
+    --vscode-textLink-foreground,
+    var(--vscode-button-background)
+  );
+  --dn-accent-hover: var(
+    --vscode-textLink-activeForeground,
+    var(--vscode-button-hoverBackground)
+  );
+  --dn-error: var(
+    --vscode-errorForeground,
+    var(--vscode-editorError-foreground)
+  );
+  --dn-warning: var(
+    --vscode-editorWarning-foreground,
+    var(--vscode-errorForeground)
+  );
+  --dn-success: var(--vscode-testing-iconPassed, var(--vscode-charts-green));
+  /* 警示色唯一来源（design-principles.md §6 V2）：状态点/聚合条/OptionGroup/工具卡共用 */
+  --dn-attention: var(
+    --vscode-editorWarning-foreground,
+    var(--vscode-errorForeground)
+  );
+  /* 待决策角标：attention 实底 + 编辑器底色文字（与未读中性角标拉开对比） */
+  --dn-attention-bg: var(
+    --vscode-editorWarning-foreground,
+    var(--vscode-errorForeground)
+  );
+  --dn-attention-fg: var(--vscode-editor-background);
+  /* running 状态点（金色呼吸） */
+  --dn-running: var(
+    --vscode-charts-yellow,
+    var(--vscode-editorWarning-foreground)
+  );
+
+  /* 列表（sidebar 会话项 hover / 选中） */
+  --dn-list-hover-bg: var(
+    --vscode-list-hoverBackground,
+    var(--vscode-editorWidget-background)
+  );
+  --dn-list-active-bg: var(
+    --vscode-list-activeSelectionBackground,
+    var(--vscode-editorWidget-background)
+  );
+
+  /* 首字母头像色块（按会话 key 散列取色，跟随主题 charts 色板） */
+  --dn-avatar-1: var(--vscode-charts-blue, var(--vscode-textLink-foreground));
+  --dn-avatar-2: var(--vscode-charts-green, var(--vscode-testing-iconPassed));
+  --dn-avatar-3: var(
+    --vscode-charts-yellow,
+    var(--vscode-editorWarning-foreground)
+  );
+  --dn-avatar-4: var(
+    --vscode-charts-orange,
+    var(--vscode-editorWarning-foreground)
+  );
+  --dn-avatar-5: var(--vscode-charts-purple, var(--vscode-textLink-foreground));
+  --dn-avatar-6: var(--vscode-charts-red, var(--vscode-errorForeground));
+
+  /* 按钮 / 输入框 */
+  --dn-button-bg: var(--vscode-button-background);
+  --dn-button-fg: var(--vscode-button-foreground);
+  --dn-button-hover: var(
+    --vscode-button-hoverBackground,
+    var(--vscode-button-background)
+  );
+  --dn-button-border: var(--vscode-button-border, transparent);
+  --dn-button-secondary-bg: var(
+    --vscode-button-secondaryBackground,
+    var(--vscode-editorWidget-background)
+  );
+  --dn-button-secondary-fg: var(
+    --vscode-button-secondaryForeground,
+    var(--vscode-foreground)
+  );
+  --dn-input-bg: var(
+    --vscode-input-background,
+    var(--vscode-editor-background)
+  );
+  --dn-input-fg: var(--vscode-input-foreground, var(--vscode-foreground));
+  --dn-input-border: var(--vscode-input-border, var(--vscode-panel-border));
+  --dn-focus-border: var(
+    --vscode-focusBorder,
+    var(--vscode-textLink-foreground)
+  );
+
+  /* 代码 / 徽标 */
+  --dn-code-bg: var(
+    --vscode-textCodeBlock-background,
+    var(--vscode-editorWidget-background)
+  );
+  --dn-badge-bg: var(
+    --vscode-badge-background,
+    var(--vscode-button-background)
+  );
+  --dn-badge-fg: var(
+    --vscode-badge-foreground,
+    var(--vscode-button-foreground)
+  );
+
+  /* 字体（非色值，关键字回退合法） */
+  --dn-font: var(--vscode-font-family, sans-serif);
+  --dn-font-mono: var(--vscode-editor-font-family, monospace);
+  --dn-font-size: var(--vscode-font-size, 13px);
+
+  /* 圆角三档（design-principles.md §6 V6）：sm 表单控件 / md 卡片 / lg 气泡 */
+  --dn-radius-sm: 4px;
+  --dn-radius-md: 12px;
+  --dn-radius-lg: 16px;
+}

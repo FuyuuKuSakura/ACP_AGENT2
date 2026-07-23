@@ -83,3 +83,16 @@ qa_reports/*.json
 
  # Session / runtime
 *.pid
+
+ # v3 monorepo (packages/*)
+*.vsix
+.vscode-test/
+packages/extension/dist-e2e/
+packages/extension/webview-dist/
+packages/extension/assets/live2d/
+packages/extension/assets/personas/
+packages/extension/mobile-dist/
+
+ # QA 产物（脚本本身保留，运行输出不入库）
+scripts/qa-*/out/
+scripts/qa-phase5/pair-token.json

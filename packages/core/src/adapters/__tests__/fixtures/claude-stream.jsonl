@@ -1,0 +1,13 @@
+# claude stream-json fixture
+# 来源：按 docs/v3/extract/adapters.md §5.2 的行样例重建（extract 原文注明样例本身
+# 即"根据解析逻辑重建"，非真实录制）。为遵守"不发任何有副作用的 prompt"的约束，
+# 本 fixture 未对真实 claude CLI 录制。覆盖：session_id 捕获（任意带该字段的行）/
+# content_block_delta（delta.text）/ message_delta（顶层 text 兼容）/ tool_use /
+# tool_result / result 结果信封 / 纯裸文本行（stderr 混入兜底）。
+{"type":"system","subtype":"init","session_id":"sess-claude-1"}
+{"type":"content_block_delta","delta":{"text":"你好"}}
+{"type":"message_delta","text":"，继续。"}
+{"type":"tool_use","id":"toolu-1","name":"Bash","input":{"command":"ls -la"}}
+{"type":"tool_result","content":"a.py b.py"}
+{"type":"result","result":"完成","session_id":"sess-claude-1"}
+claude stderr noise line

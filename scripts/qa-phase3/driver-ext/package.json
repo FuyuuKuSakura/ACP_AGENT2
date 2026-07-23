@@ -1,0 +1,15 @@
+{
+  "name": "dionysus-qa-driver",
+  "displayName": "Dionysus QA Driver (Phase 3 gate)",
+  "version": "0.0.1",
+  "private": true,
+  "publisher": "dionysus-qa",
+  "description": "QA-only driver: executes dionysus commands on a schedule driven by signal files. Not shipped.",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./driver.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ]
+}

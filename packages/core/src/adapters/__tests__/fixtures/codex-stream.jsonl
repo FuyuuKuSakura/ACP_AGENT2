@@ -1,0 +1,19 @@
+# codex stream-json fixture
+# 来源：按 docs/v3/extract/adapters.md §5.3 的行样例重建（extract 原文注明样例本身
+# 即"根据解析逻辑重建"，非真实录制）。为遵守"不发任何有副作用的 prompt"的约束，
+# 本 fixture 未对真实 codex CLI 录制。覆盖：thread_id 捕获 / agent_message /
+# command_execution / tool_call（arguments 为 JSON 字符串）/ item.completed
+# （agent_message 与 command_execution 两种 item.type，后者带 exit_code）/
+# turn.started 静默 / error 与 turn.failed 错误收尾 / result 结果信封 / 纯裸文本行。
+{"type":"thread.started","thread_id":"thr-1"}
+{"type":"turn.started"}
+{"type":"agent_message","content":"修复完成"}
+{"type":"command_execution","command":"ls -la"}
+{"type":"tool_call","name":"shell","arguments":"{\"cmd\":\"ls\"}"}
+{"type":"item.completed","item":{"type":"agent_message","text":"完成了"}}
+{"type":"item.completed","item":{"type":"command_execution","command":"ls","aggregated_output":"a.py","exit_code":0}}
+{"type":"item.completed","item":{"type":"command_execution","command":"false","aggregated_output":"","exit_code":1}}
+{"type":"error","message":"stream boom"}
+{"type":"turn.failed","error":{"message":"turn blew up"}}
+{"type":"result","result":"done"}
+codex stderr noise line

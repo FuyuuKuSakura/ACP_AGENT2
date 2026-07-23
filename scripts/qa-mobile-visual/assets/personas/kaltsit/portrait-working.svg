@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" width="600" height="900">
+  <defs>
+    <linearGradient id="hairW" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8efe9"/>
+      <stop offset="1" stop-color="#aec6ba"/>
+    </linearGradient>
+    <linearGradient id="coatW" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f6f4"/>
+      <stop offset="1" stop-color="#d6ded9"/>
+    </linearGradient>
+  </defs>
+  <!-- 猫耳（微前倾 = 专注） -->
+  <path d="M205 185 L220 55 L296 135 Z" fill="url(#hairW)" stroke="#8fa89c" stroke-width="6"/>
+  <path d="M388 185 L375 55 L304 135 Z" fill="url(#hairW)" stroke="#8fa89c" stroke-width="6"/>
+  <path d="M228 155 L236 95 L276 132 Z" fill="#c9a0a0"/>
+  <path d="M366 155 L360 95 L322 132 Z" fill="#c9a0a0"/>
+  <!-- 长发 -->
+  <path d="M190 260 Q170 140 300 130 Q430 140 410 260 L430 560 Q360 610 300 610 Q240 610 170 560 Z" fill="url(#hairW)"/>
+  <!-- 脸 -->
+  <ellipse cx="300" cy="280" rx="95" ry="88" fill="#f6e4d8"/>
+  <!-- 刘海 -->
+  <path d="M205 260 Q215 170 300 165 Q385 170 395 260 Q350 205 330 230 Q318 190 300 190 Q282 190 270 230 Q250 205 205 260 Z" fill="url(#hairW)"/>
+  <!-- 眼（专注：半眯 + 眉压低） -->
+  <path d="M238 252 Q258 244 278 250" stroke="#7a968a" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M322 250 Q342 244 362 252" stroke="#7a968a" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="258" cy="288" rx="15" ry="16" fill="#2f6b52"/>
+  <ellipse cx="342" cy="288" rx="15" ry="16" fill="#2f6b52"/>
+  <circle cx="263" cy="282" r="5" fill="#ffffff"/>
+  <circle cx="347" cy="282" r="5" fill="#ffffff"/>
+  <!-- 嘴（抿） -->
+  <path d="M286 332 L314 332" stroke="#c98f7a" stroke-width="5" stroke-linecap="round"/>
+  <!-- 身体 -->
+  <path d="M215 420 Q300 380 385 420 L430 880 L170 880 Z" fill="url(#coatW)" stroke="#b9c6bf" stroke-width="4"/>
+  <path d="M275 415 L300 470 L325 415 L340 430 L312 880 L288 880 L260 430 Z" fill="#4a7a68"/>
+  <!-- 手持终端板 -->
+  <rect x="330" y="520" width="150" height="210" rx="16" fill="#33413b" stroke="#22302a" stroke-width="4"/>
+  <rect x="344" y="540" width="122" height="14" rx="7" fill="#67c39a"/>
+  <rect x="344" y="566" width="90" height="14" rx="7" fill="#4a8a6c"/>
+  <rect x="344" y="592" width="106" height="14" rx="7" fill="#67c39a"/>
+  <path d="M330 560 Q300 540 296 500" stroke="#f6e4d8" stroke-width="22" fill="none" stroke-linecap="round"/>
+  <!-- 前发 -->
+  <path d="M205 250 Q190 380 215 470 Q228 380 232 300 Z" fill="url(#hairW)"/>
+  <path d="M395 250 Q410 380 385 470 Q372 380 368 300 Z" fill="url(#hairW)"/>
+</svg>

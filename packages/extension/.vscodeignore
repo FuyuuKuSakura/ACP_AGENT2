@@ -1,0 +1,15 @@
+# vsce 打包排除清单（注意：vsce 不支持与 package.json files 白名单并存，故只用本文件）
+# 运行时依赖已全部 esbuild 进 dist/extension.js（--external 仅 vscode），node_modules 不进包
+node_modules/**
+src/**
+scripts/**
+dist-e2e/**
+.vscode-test/**
+**/*.map
+**/tsconfig.json
+**/vitest.config.ts
+.vscode-test.mjs
+**/*.test.js
+**/__tests__/**
+# 打包产物自身
+*.vsix

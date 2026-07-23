@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" width="600" height="900">
+  <defs>
+    <linearGradient id="hairI" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8efe9"/>
+      <stop offset="1" stop-color="#aec6ba"/>
+    </linearGradient>
+    <linearGradient id="coatI" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f6f4"/>
+      <stop offset="1" stop-color="#d6ded9"/>
+    </linearGradient>
+  </defs>
+  <!-- 猫耳 -->
+  <path d="M210 190 L228 60 L300 140 Z" fill="url(#hairI)" stroke="#8fa89c" stroke-width="6"/>
+  <path d="M390 190 L372 60 L300 140 Z" fill="url(#hairI)" stroke="#8fa89c" stroke-width="6"/>
+  <path d="M232 160 L242 100 L280 138 Z" fill="#c9a0a0"/>
+  <path d="M368 160 L358 100 L320 138 Z" fill="#c9a0a0"/>
+  <!-- 长发（背后） -->
+  <path d="M190 260 Q170 140 300 130 Q430 140 410 260 L430 560 Q360 610 300 610 Q240 610 170 560 Z" fill="url(#hairI)"/>
+  <!-- 脸 -->
+  <ellipse cx="300" cy="280" rx="95" ry="88" fill="#f6e4d8"/>
+  <!-- 刘海 -->
+  <path d="M205 260 Q215 170 300 165 Q385 170 395 260 Q350 205 330 230 Q318 190 300 190 Q282 190 270 230 Q250 205 205 260 Z" fill="url(#hairI)"/>
+  <!-- 眼（平静） -->
+  <ellipse cx="258" cy="285" rx="15" ry="20" fill="#3d7a5f"/>
+  <ellipse cx="342" cy="285" rx="15" ry="20" fill="#3d7a5f"/>
+  <circle cx="263" cy="278" r="5" fill="#ffffff"/>
+  <circle cx="347" cy="278" r="5" fill="#ffffff"/>
+  <path d="M240 258 Q258 250 276 258" stroke="#8fa89c" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M324 258 Q342 250 360 258" stroke="#8fa89c" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- 嘴 -->
+  <path d="M285 330 Q300 336 315 330" stroke="#c98f7a" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- 身体：白大褂 +  teal 内衬 -->
+  <path d="M215 420 Q300 380 385 420 L430 880 L170 880 Z" fill="url(#coatI)" stroke="#b9c6bf" stroke-width="4"/>
+  <path d="M275 415 L300 470 L325 415 L340 430 L312 880 L288 880 L260 430 Z" fill="#4a7a68"/>
+  <!-- 听诊器 -->
+  <path d="M262 440 Q240 520 262 560 Q280 585 300 560" stroke="#5f7a70" stroke-width="8" fill="none"/>
+  <circle cx="300" cy="566" r="16" fill="#5f7a70"/>
+  <!-- 前发垂落 -->
+  <path d="M205 250 Q190 380 215 470 Q228 380 232 300 Z" fill="url(#hairI)"/>
+  <path d="M395 250 Q410 380 385 470 Q372 380 368 300 Z" fill="url(#hairI)"/>
+</svg>

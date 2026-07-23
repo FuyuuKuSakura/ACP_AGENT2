@@ -1,0 +1,180 @@
+/* 主题 token 在 theme/vscode.css（由 main.tsx 先行 import，保证 --dn-* 先定义） */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+ * 全局基底：颜色一律经 theme/vscode.css 的 --dn-* token（var(--vscode-*) 映射）
+ * ------------------------------------------------------------------------- */
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--dn-font);
+  font-size: var(--dn-font-size);
+  color: var(--dn-fg);
+  background: var(--dn-bg);
+}
+
+code,
+pre {
+  font-family: var(--dn-font-mono);
+}
+
+/* ---------------------------------------------------------------------------
+ * 动效（ux-core-flows.md §3：进行中旋转 Loader；状态点呼吸）
+ * ------------------------------------------------------------------------- */
+
+@keyframes dn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dn-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* 工具卡进行中 Loader（复用 StreamingStatusBox 模式的行内状态动画） */
+.dn-loader {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid var(--dn-accent);
+  border-top-color: transparent;
+  border-radius: 9999px;
+  animation: dn-spin 0.8s linear infinite;
+}
+
+/* thinking 区域 / waiting 状态点的呼吸动画 */
+.dn-breathe {
+  animation: dn-breathe 1.6s ease-in-out infinite;
+}
+
+/* endfield 细刻度线（minimal 几何点缀：陪伴区舞台顶部校准刻度，
+ * 色走 --dn-muted token，跟随 VS Code 皮肤，ADR-20 不破） */
+.dn-ticks {
+  height: 5px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--dn-muted) 0,
+    var(--dn-muted) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+  opacity: 0.4;
+}
+
+/* ---------------------------------------------------------------------------
+ * markdown 渲染（.dn-md）：agent 气泡正文，代码块高亮从简
+ * ------------------------------------------------------------------------- */
+
+.dn-md > :first-child {
+  margin-top: 0;
+}
+.dn-md > :last-child {
+  margin-bottom: 0;
+}
+
+.dn-md p,
+.dn-md ul,
+.dn-md ol,
+.dn-md pre,
+.dn-md blockquote,
+.dn-md table {
+  margin: 0.4rem 0;
+}
+
+.dn-md h1,
+.dn-md h2,
+.dn-md h3,
+.dn-md h4 {
+  margin: 0.6rem 0 0.3rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.dn-md h1 {
+  font-size: 1.15em;
+}
+.dn-md h2 {
+  font-size: 1.1em;
+}
+.dn-md h3 {
+  font-size: 1.05em;
+}
+
+.dn-md ul,
+.dn-md ol {
+  padding-left: 1.4rem;
+}
+
+.dn-md code {
+  background: var(--dn-code-bg);
+  border-radius: var(--dn-radius-sm);
+  padding: 0.1em 0.35em;
+  font-size: 0.92em;
+}
+
+.dn-md pre {
+  background: var(--dn-code-bg);
+  border: 1px solid var(--dn-border);
+  border-radius: var(--dn-radius-sm);
+  padding: 0.6rem 0.75rem;
+  overflow-x: auto;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.dn-md pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.dn-md a {
+  color: var(--dn-accent);
+  text-decoration: underline;
+}
+
+.dn-md blockquote {
+  border-left: 3px solid var(--dn-border);
+  padding-left: 0.75rem;
+  color: var(--dn-muted);
+}
+
+.dn-md table {
+  border-collapse: collapse;
+}
+.dn-md th,
+.dn-md td {
+  border: 1px solid var(--dn-border);
+  padding: 0.25rem 0.6rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * 滚动条（跟随 VS Code 主题）
+ * ------------------------------------------------------------------------- */
+
+.dn-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.dn-scroll::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background, var(--dn-border));
+  border-radius: var(--dn-radius-sm);
+}
+.dn-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground, var(--dn-border));
+}

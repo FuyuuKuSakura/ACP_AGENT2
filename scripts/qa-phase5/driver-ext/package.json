@@ -1,0 +1,15 @@
+{
+  "name": "dionysus-qa-driver-phase5",
+  "displayName": "Dionysus QA Driver (Phase 5 gate)",
+  "version": "0.0.1",
+  "private": true,
+  "publisher": "dionysus-qa",
+  "description": "QA-only driver: executes dionysus commands via signal files and captures pair tokens. Not shipped.",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./driver.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ]
+}

@@ -1,0 +1,287 @@
+{
+  "Version": 3,
+  "Type": 0,
+  "FileReferences": {
+    "Moc": "凯尔希直播版1.moc3",
+    "Textures": [
+      "凯尔希直播版1.4096/texture_00.png"
+    ],
+    "Physics": "凯尔希直播版1.physics3.json",
+    "PhysicsV2": {
+      "File": "凯尔希直播版1.physics3.json"
+    },
+    "Motions": {
+      "Idle": [
+        {
+          "Name": "待机",
+          "File": "daiji(gai).motion3.json",
+          "Priority": 2,
+          "Weight": 3
+        },
+        {
+          "Name": "时间",
+          "File": "分针旋转.motion3.json",
+          "Priority": 2
+        }
+      ],
+      "Tick": [
+        {
+          "Name": "办公打盹",
+          "File": "bangong.motion3.json",
+          "Priority": 3
+        },
+        {
+          "Name": "闲置",
+          "File": "xianzhi(gai).motion3.json",
+          "Sound": "闲置.wav",
+          "Priority": 3
+        },
+        {
+          "Name": "M3闲置",
+          "File": "M3 daiji.motion3.json",
+          "Priority": 3,
+          "Weight": 3
+        }
+      ],
+      "戳戳": [
+        {
+          "Name": "戳头",
+          "File": "chuo tou.motion3.json",
+          "Sound": "M3.wav",
+          "SoundDelay": 1150,
+          "Priority": 4,
+          "Intimacy": {
+            "Bonus": -1
+          }
+        },
+        {
+          "Name": "烦躁",
+          "File": "fanzao.motion3.json",
+          "Sound": "醒过来.wav",
+          "SoundDelay": 1000,
+          "Text": "醒醒。",
+          "TextDelay": 1000,
+          "TextDuration": 750,
+          "Priority": 3
+        },
+        {
+          "Name": "感谢",
+          "File": "ganxie.motion3.json",
+          "Sound": "感谢.wav",
+          "Text": "感谢你的关心，博士。",
+          "TextDelay": 500,
+          "TextDuration": 2500,
+          "Priority": 3,
+          "Intimacy": {
+            "Min": 3,
+            "Bonus": 2
+          }
+        },
+        {
+          "Name": "惊讶",
+          "File": "jingya.motion3.json",
+          "Priority": 3,
+          "Intimacy": {
+            "Bonus": 1
+          }
+        },
+        {
+          "Name": "冷汗",
+          "File": "lenghan.motion3.json",
+          "Priority": 3
+        },
+        {
+          "Name": "猫猫脸",
+          "File": "maomaolian.motion3.json",
+          "Sound": "猫猫脸.wav",
+          "Text": "阿米娅去参加年轻干员们的聚餐了。···？",
+          "Priority": 3,
+          "Intimacy": {
+            "Min": 5,
+            "Bonus": 1
+          }
+        },
+        {
+          "Name": "叹气",
+          "File": "tanqi.motion3.json",
+          "Priority": 3
+        },
+        {
+          "Name": "无语",
+          "File": "wuyu.motion3.json",
+          "Priority": 3
+        },
+        {
+          "Name": "信赖",
+          "File": "xinlai.motion3.json",
+          "Sound": "信赖触摸.wav",
+          "Text": "你似乎更加适应自己的工作和职责了，更像一个领导者了。",
+          "Priority": 3,
+          "Intimacy": {
+            "Min": 10
+          }
+        },
+        {
+          "Name": "疑问",
+          "File": "yiwen.motion3.json",
+          "Priority": 3,
+          "Intimacy": {
+            "Bonus": 1
+          }
+        },
+        {
+          "Name": "我的愿望",
+          "File": "我的愿望.motion3.json",
+          "Sound": "我的愿望.wav",
+          "Text": "我的愿望？我的愿望就是守护好你和阿米娅的愿望，博士，我立下的誓言我永远不会背弃。尽管我们对守护的定义各不相同，但我会站在这里，直到最后。",
+          "Priority": 3
+        }
+      ]
+    }
+  },
+  "Controllers": {
+    "ParamHit": {},
+    "ParamLoop": {},
+    "KeyTrigger": {},
+    "ParamTrigger": {},
+    "AreaTrigger": {},
+    "HandTrigger": {},
+    "EyeBlink": {
+      "MinInterval": 500,
+      "MaxInterval": 6000,
+      "Items": [
+        {
+          "Id": "ParamEyeLOpen",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        },
+        {
+          "Id": "ParamEyeROpen",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        },
+        {
+          "Id": "ParamHairFront",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        },
+        {
+          "Id": "ParamHairSide",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        },
+        {
+          "Id": "ParamHairBack",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        },
+        {
+          "Id": "Param8",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        }
+      ],
+      "Enabled": true
+    },
+    "LipSync": {
+      "Gain": 5.0
+    },
+    "MouseTracking": {
+      "SmoothTime": 0.15,
+      "Enabled": true
+    },
+    "AutoBreath": {
+      "Enabled": true
+    },
+    "ExtraMotion": {
+      "Enabled": true
+    },
+    "Accelerometer": {
+      "Enabled": true
+    },
+    "Microphone": {},
+    "Transform": {},
+    "FaceTracking": {
+      "Enabled": true
+    },
+    "HandTracking": {},
+    "ParamValue": {},
+    "PartOpacity": {},
+    "ArtmeshOpacity": {},
+    "ArtmeshColor": {},
+    "ArtmeshCulling": {
+      "DefaultMode": 0
+    },
+    "IntimacySystem": {}
+  },
+  "HitAreas": [
+    {
+      "Name": "pen",
+      "Id": "pen",
+      "Motion": "戳戳:疑问"
+    },
+    {
+      "Name": "biji",
+      "Id": "biji",
+      "Motion": "戳戳:感谢"
+    },
+    {
+      "Name": "刘海",
+      "Id": "liuhai",
+      "Motion": "戳戳:戳头"
+    },
+    {
+      "Name": "左侧发",
+      "Id": "ArtMesh4",
+      "Motion": "戳戳:冷汗"
+    },
+    {
+      "Name": "右耳朵",
+      "Id": "ArtMesh6",
+      "Motion": "戳戳:惊讶"
+    },
+    {
+      "Name": "左耳朵",
+      "Id": "ArtMesh8",
+      "Motion": "戳戳:无语"
+    },
+    {
+      "Name": "zhongbiao",
+      "Id": "zhongbiao",
+      "Motion": "戳戳:信赖"
+    },
+    {
+      "Name": "右文件",
+      "Id": "ArtMesh5",
+      "Motion": "戳戳:叹气"
+    },
+    {
+      "Name": "touding",
+      "Id": "touding",
+      "Motion": "戳戳:猫猫脸"
+    },
+    {
+      "Name": "zhuomian",
+      "Id": "zhuomian",
+      "Motion": "戳戳:烦躁"
+    },
+    {
+      "Name": "face4",
+      "Id": "face4",
+      "Motion": "戳戳:我的愿望"
+    }
+  ],
+  "Options": {}
+}

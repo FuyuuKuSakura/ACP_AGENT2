@@ -1,0 +1,315 @@
+{
+  "name": "dionysus-vscode",
+  "displayName": "Dionysus - AI 助手陪伴",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI 编程助手统一客户端：多 CLI（Kimi Code / Claude Code / Codex / OpenCode / CodeBuddy）并行管理、Live2D 角色陪伴与进度汇报、手机扫码随时掌控进展。",
+  "publisher": "dionysus",
+  "categories": [
+    "Machine Learning",
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "kimi",
+    "claude",
+    "codex",
+    "live2d",
+    "companion",
+    "mobile"
+  ],
+  "icon": "assets/icon.png",
+  "galleryBanner": {
+    "color": "#20312A",
+    "theme": "dark"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dionysus/dionysus-vscode"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "dionysus.openChat",
+        "title": "打开聊天",
+        "category": "Dionysus"
+      },
+      {
+        "command": "dionysus.openSettings",
+        "title": "角色与素材库设置",
+        "category": "Dionysus"
+      },
+      {
+        "command": "dionysus.newSession",
+        "title": "新建会话",
+        "category": "Dionysus"
+      },
+      {
+        "command": "dionysus.interrupt",
+        "title": "打断当前任务",
+        "category": "Dionysus"
+      },
+      {
+        "command": "dionysus.selectAdapter",
+        "title": "选择 AI 助手",
+        "category": "Dionysus"
+      },
+      {
+        "command": "dionysus.selectPersona",
+        "title": "选择角色",
+        "category": "Dionysus"
+      },
+      {
+        "command": "dionysus.showPairingQr",
+        "title": "显示配对二维码",
+        "category": "Dionysus"
+      },
+      {
+        "command": "dionysus.redetectAgents",
+        "title": "重新检测 AI 助手",
+        "category": "Dionysus"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dionysus",
+          "title": "Dionysus",
+          "icon": "assets/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "dionysus": [
+        {
+          "type": "webview",
+          "id": "dionysus.sessionList",
+          "name": "会话列表"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Dionysus",
+      "properties": {
+        "dionysus.adapter.default": {
+          "type": "string",
+          "default": "",
+          "description": "默认使用的 AI 助手。留空 = 自动使用第一个检测到的可用 CLI。"
+        },
+        "dionysus.adapters": {
+          "type": "object",
+          "default": {},
+          "description": "AI 助手（CLI）适配器配置表，键为自定义的助手名，每个条目指定 CLI 类型、命令名和可选的模型。",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "CLI 类型，如 kimi_code_cli、claude_code_cli、codex_cli、opencode_cli、codebuddy_cli。"
+              },
+              "command": {
+                "type": "string",
+                "description": "CLI 可执行文件名，如 kimi、claude。留空则用类型对应的默认命令。"
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "description": "使用的模型名（部分 CLI 支持）。留空 = 用 CLI 自己的默认模型。"
+              }
+            }
+          }
+        },
+        "dionysus.maxConcurrentAgents": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "description": "同时运行的 AI 助手数量上限（每个进行中的会话对应一个 CLI 子进程）。"
+        },
+        "dionysus.workingDir": {
+          "type": "string",
+          "default": "${workspaceFolder}",
+          "description": "AI 助手的工作目录，默认跟随当前工作区。"
+        },
+        "dionysus.persona.default": {
+          "type": "string",
+          "default": "",
+          "description": "默认角色。留空 = 按已安装的角色素材自动选择。"
+        },
+        "dionysus.session.optionTimeoutAction": {
+          "type": "string",
+          "enum": [
+            "deny",
+            "default",
+            "keep"
+          ],
+          "enumDescriptions": [
+            "视为拒绝该选项",
+            "采用 AI 助手给出的默认选项",
+            "不做处理，继续等你回复（状态仍可查看）"
+          ],
+          "default": "keep",
+          "description": "AI 助手向你确认选项、但超时未收到回复时的处理方式。"
+        },
+        "dionysus.lan.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "开启局域网连接，让手机扫码配对、在浏览器里使用。仅在可信网络（如家里 Wi-Fi）开启。"
+        },
+        "dionysus.lan.port": {
+          "type": "number",
+          "default": 8765,
+          "description": "局域网服务端口；被占用时自动向后递增重试。"
+        },
+        "dionysus.supervisor.mode": {
+          "type": "string",
+          "enum": [
+            "disabled",
+            "template",
+            "agent_session",
+            "deepseek_api"
+          ],
+          "enumDescriptions": [
+            "关闭角色播报",
+            "内置模板播报，零额外成本、离线可用（默认）",
+            "复用已配置的 AI 助手生成播报（消耗 CLI 额度）",
+            "调用 DeepSeek API 生成播报（消耗 API 额度，key 存在 VS Code 密钥存储中）"
+          ],
+          "default": "template",
+          "description": "角色进度播报的生成方式。"
+        },
+        "dionysus.supervisor.intervalSeconds": {
+          "type": "number",
+          "default": 15,
+          "minimum": 5,
+          "description": "角色播报检查各会话进展的间隔（秒），最小 5 秒。"
+        },
+        "dionysus.supervisor.adapterId": {
+          "type": "string",
+          "default": "",
+          "description": "agent_session 播报模式复用的 AI 助手；留空 = 跟随默认助手。"
+        },
+        "dionysus.supervisor.llm.baseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "deepseek_api 播报模式的 API 地址。"
+        },
+        "dionysus.supervisor.llm.model": {
+          "type": "string",
+          "default": "",
+          "description": "deepseek_api 播报模式的模型名。"
+        },
+        "dionysus.persona.injectIntoAgent": {
+          "type": "boolean",
+          "default": false,
+          "description": "可选增强：把角色语气拼进 AI 助手的第一轮输入。默认关闭——角色语气默认由汇报旁白的改写通道承担，不影响 AI 助手的实际回答。"
+        },
+        "dionysus.character.display.desktop": {
+          "type": "string",
+          "enum": [
+            "live2d",
+            "static"
+          ],
+          "enumDescriptions": [
+            "Live2D 动态模型",
+            "静态立绘"
+          ],
+          "default": "live2d",
+          "description": "桌面端角色的展示方式。"
+        },
+        "dionysus.character.display.mobile": {
+          "type": "string",
+          "enum": [
+            "live2d",
+            "static"
+          ],
+          "enumDescriptions": [
+            "Live2D 动态模型（默认）",
+            "静态立绘（省流量）"
+          ],
+          "default": "live2d",
+          "description": "手机端角色的展示方式。"
+        }
+      }
+    },
+    "walkthroughs": [
+      {
+        "id": "dionysus.gettingStarted",
+        "title": "Dionysus 上手引导",
+        "description": "四步上手 Dionysus：装好 AI 助手、聊完第一轮、再把手机连上。",
+        "steps": [
+          {
+            "id": "dionysus.installCli",
+            "title": "安装一个 AI 助手 CLI",
+            "description": "Dionysus 本身不含 AI，需要搭配至少一个 AI 助手命令行工具——支持 Kimi Code、Claude Code、OpenCode、Codex、CodeBuddy 五个，任选一个按它的官方文档安装即可。装好后在命令面板运行「Dionysus: 重新检测 AI 助手」，确认识别成功。",
+            "completionEvents": [
+              "onCommand:dionysus.redetectAgents"
+            ]
+          },
+          {
+            "id": "dionysus.openChat",
+            "title": "打开 Dionysus 聊天",
+            "description": "在命令面板运行「Dionysus: 打开聊天」。聊天面板里有出厂角色凯尔希（kal'tsit）在场陪伴。",
+            "completionEvents": [
+              "onCommand:dionysus.openChat"
+            ]
+          },
+          {
+            "id": "dionysus.firstConversation",
+            "title": "完成第一轮对话",
+            "description": "在输入框里给 AI 助手布置一个小任务（比如「帮我看看这个项目是干什么的」）并发送。它读文件、改代码、跑命令的每一步都会清楚显示在对话里。"
+          },
+          {
+            "id": "dionysus.pairMobile",
+            "title": "扫码配对手机",
+            "description": "离开电脑也想看进展、发指令？运行「Dionysus: 显示配对二维码」，用手机扫一下（手机需与电脑连接同一个 Wi-Fi），就能在浏览器里随时掌握动态。",
+            "completionEvents": [
+              "onCommand:dionysus.showPairingQr"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --target=node18 --sourcemap",
+    "build:e2e": "esbuild src/__tests__/e2e/runner.e2e.ts --bundle --outfile=dist-e2e/index.js --external:vscode --format=cjs --platform=node --target=node18 --sourcemap",
+    "test:e2e": "npm run build && npm run build:e2e && node .vscode-test.mjs",
+    "test": "vitest run",
+    "vscode:prepublish": "npm run build && node scripts/prepackage.mjs",
+    "package:vsix": "mkdir -p ../../release && NODE_OPTIONS=\"--require ./scripts/polyfill-file.cjs\" vsce package --no-dependencies --out ../../release/",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@dionysus/client-core": "^0.1.0",
+    "@dionysus/core": "^0.1.0",
+    "@dionysus/protocol": "^0.1.0",
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.0",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.130",
+    "@types/qrcode": "^1.5.5",
+    "@types/vscode": "^1.85.0",
+    "@types/ws": "^8.18.0",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^2.24.0",
+    "esbuild": "^0.20.2",
+    "typescript": "~5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

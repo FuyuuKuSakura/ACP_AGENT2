@@ -1,0 +1,16 @@
+# kimi stream-json fixture
+# 来源：按 docs/v3/extract/adapters.md §4.3 / §5.1 的行样例重建（extract 原文注明样例
+# 本身即"根据解析逻辑重建"，非真实录制）。为遵守"不发任何有副作用的 prompt"的约束，
+# 本 fixture 未对真实 kimi CLI 录制；覆盖：meta resume_hint / assistant content /
+# assistant tool_calls（无原生 id 与有原生 id 各一）/ role=tool / 一行多 JSON + 裸文本尾巴 /
+# 纯裸文本行 / CLI 日志噪声行 / 未知 JSON 形状 / 协议透传行。
+{"role": "meta", "type": "session.resume_hint", "session_id": "sess-abc-123"}
+{"role": "assistant", "content": "好的，我来修改这个文件。"}
+{"role": "assistant", "tool_calls": [{"function": {"name": "read_file", "arguments": "{\"path\": \"a.py\"}"}}]}
+{"role": "tool", "content": "file contents..."}
+{"role": "assistant", "content": "接着运行测试。"} {"role": "assistant", "tool_calls": [{"id": "call-1", "function": {"name": "run_command", "arguments": "{\"cmd\": \"npm test\"}"}}]} trailing noise
+{"role": "tool", "content": "tests passed"}
+plain non-json line (e.g. stderr traceback leak)
+Reading additional input from stdin...
+{"foo": "bar", "n": 1}
+{"type": "agent_stream", "payload": {"chunk": "passthrough chunk"}}

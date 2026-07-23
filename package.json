@@ -1,0 +1,30 @@
+{
+  "name": "dionysus",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dionysus v3 — VS Code extension + mobile client (TypeScript monorepo)",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=10"
+  },
+  "overrides": {
+    "eslint-visitor-keys": "4.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "eslint": "^9.9.0",
+    "prettier": "^3.3.3",
+    "typescript": "~5.4.5",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^1.6.0"
+  }
+}
